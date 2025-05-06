@@ -1,54 +1,63 @@
-# React + TypeScript + Vite
+# Avara — Modern Banking Made Simple
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Avara is a sleek, modular, and fully customizable frontend application for managing bank accounts, visualizing transaction analytics, and handling internal operations like transfers and user controls. Built with **React**, **TailwindCSS**, and **ShadCN UI**, it merges performance with aesthetics for a next-gen banking experience.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Features
 
-## Expanding the ESLint configuration
+- Clean, card-based user dashboard with KPIs, charts, and filtered transaction history.
+- Transaction manager supporting deposits, withdrawals, and internal/external transfers.
+- Admin panel with user inspection, admin-side actions, and analytics.
+- Light/Dark mode support with a token-based design system and custom fonts.
+- Gradient-powered charts with theme-consistent coloring.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+---
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-});
+## Tech Stack
+
+- React 19
+- TypeScript
+- TailwindCSS
+- ShadCN UI
+- Vite
+
+---
+
+## Folder Structure
+
+```
+src/
+├── components/       # Reusable UI components
+├── lib/              # Utilities and helpers
+├── styles/           # Global styles (e.g., Satoshi, tokens)
+├── pages/            # Page-level views
+└── App.tsx           # Main entry point
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+---
 
-```js
-// eslint.config.js
-import reactDom from 'eslint-plugin-react-dom';
-import reactX from 'eslint-plugin-react-x';
+## Customization
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-});
+- Typography is powered by [Satoshi](https://www.fontshare.com/fonts/satoshi).
+- All colors, spacing, and radii are defined via CSS variables for easy theming.
+- Dark mode is fully supported and toggled using `.dark`.
+
+---
+
+## Setup
+
+```bash
+pnpm install
+pnpm dev
 ```
+
+> Requires Node.js ≥18 and `pnpm` installed.
+
+---
+
+## License
+
+MIT — feel free to build on top of Avara.
+
+Built by [@yznki](https://github.com/yznki)
