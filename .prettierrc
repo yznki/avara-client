@@ -1,0 +1,24 @@
+{
+  "semi": true,
+  "singleQuote": true,
+  "trailingComma": "all",
+  "printWidth": 100,
+  "tabWidth": 2,
+  "useTabs": false,
+  "bracketSpacing": true,
+  "arrowParens": "always",
+  "endOfLine": "auto",
+  "plugins": ["prettier-plugin-tailwindcss", "@ianvs/prettier-plugin-sort-imports"],
+  "tailwindConfig": "./tailwind.config.ts",
+  "importOrder": [
+    "^(react|next|expo|vue)$",
+    "<THIRD_PARTY_MODULES>",
+    "^@/config(.*)$",
+    "^@/lib(.*)$",
+    "^@/components(.*)$",
+    "^@/hooks(.*)$",
+    "^@/styles(.*)$",
+    "^@/app(.*)$",
+    "^[./]"
+  ]
+}
