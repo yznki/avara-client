@@ -1,6 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
+import axios from 'axios';
 
 type CurrencyContextType = {
   currency: string;
@@ -25,10 +26,10 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
     if (parsed?.date === today && parsed?.rates) {
       setRates(parsed.rates);
     } else {
-      fetch(CURRENCY_API_URL)
-        .then((res) => res.json())
-        .then((data) => {
-          const rateMap = data.data;
+      axios
+        .get(CURRENCY_API_URL)
+        .then((res) => {
+          const rateMap = res.data.data;
           setRates(rateMap);
           localStorage.setItem('currencyCache', JSON.stringify({ date: today, rates: rateMap }));
         })
