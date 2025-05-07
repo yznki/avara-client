@@ -89,8 +89,8 @@
   --sidebar-ring: #4094ff;
   --sidebar: hsl(0 0% 98%);
 
-  --font-sans: 'Satoshi-Regular', sans-serif;
-  --font-heading: 'Satoshi-Bold', sans-serif;
+  --font-sans: 'Satoshi-Variable', sans-serif;
+  --font-heading: 'Satoshi-Variable', sans-serif;
 }
 
 /* Dark mode theme */
