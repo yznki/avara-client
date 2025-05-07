@@ -65,8 +65,8 @@
   --muted: #f2f2f2;
   --muted-foreground: #555555;
 
-  --accent: #04bfae;
-  --accent-foreground: #ffffff;
+  --accent: #f4f4f7;
+  --accent-foreground: #1e1e1e;
 
   --destructive: #ef4444;
   --border: #ebebeb;
@@ -83,13 +83,14 @@
   --sidebar-foreground: #111111;
   --sidebar-primary: #0b5af5;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #04bfae;
-  --sidebar-accent-foreground: #ffffff;
+  --sidebar-accent: #f4f4f7;
+  --sidebar-accent-foreground: #1e1e1e;
   --sidebar-border: #ebebeb;
   --sidebar-ring: #4094ff;
+  --sidebar: hsl(0 0% 98%);
 
-  --font-sans: 'Satoshi-Regular', sans-serif;
-  --font-heading: 'Satoshi-Bold', sans-serif;
+  --font-sans: 'Satoshi-Variable', sans-serif;
+  --font-heading: 'Satoshi-Variable', sans-serif;
 }
 
 /* Dark mode theme */
@@ -110,7 +111,7 @@
   --muted: #333333;
   --muted-foreground: #a3a3a3;
 
-  --accent: #a7f9ef;
+  --accent: #356df7;
   --accent-foreground: #0c2985;
 
   --destructive: #ff6b6b;
@@ -128,10 +129,11 @@
   --sidebar-foreground: #ffffff;
   --sidebar-primary: #d4e3ff;
   --sidebar-primary-foreground: #0b5af5;
-  --sidebar-accent: #a7f9ef;
+  --sidebar-accent: #356df7;
   --sidebar-accent-foreground: #111111;
   --sidebar-border: #333333;
   --sidebar-ring: #4094ff;
+  --sidebar: hsl(240 5.9% 10%);
 }
 
 /* Tailwind base layer */
