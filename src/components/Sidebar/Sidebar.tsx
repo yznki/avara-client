@@ -1,13 +1,10 @@
 import * as React from 'react';
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarFooter,
-  SidebarHeader,
-  SidebarRail,
-} from '@/components/ui/sidebar';
+import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader } from '@/components/ui/sidebar';
 import { NavLogo } from './NavLogo';
+import { NavMain } from './NavMain';
+import { NavSecondary } from './NavSecondary';
 import { NavUser } from './NavUser';
+import { SidebarNavActionsGroup } from './SidebarNavActionsGroup';
 
 export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
   return (
@@ -16,12 +13,23 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
         <NavLogo />
       </SidebarHeader>
       <SidebarContent>
-        {/* Add buttons */}
-        {/* Add navigation buttons */}
+        {/* TODO: When implementing the transactions add the modal control here. */}
+        <SidebarNavActionsGroup
+          onDeposit={function (): void {
+            throw new Error('Function not implemented.');
+          }}
+          onWithdraw={function (): void {
+            throw new Error('Function not implemented.');
+          }}
+          onTransfer={function (): void {
+            throw new Error('Function not implemented.');
+          }}
+        />
+        <NavMain />
+        <NavSecondary />
       </SidebarContent>
       <SidebarFooter>
-        {/* Add sidebar controls. */}
-        {/* Add Currency Selector */}
+        {/* TODO: When adding api, change this to a user. */}
         <NavUser
           user={{
             name: 'John Doe',
@@ -30,7 +38,6 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
           }}
         />
       </SidebarFooter>
-      <SidebarRail />
     </Sidebar>
   );
 }

@@ -29,7 +29,7 @@ export function NavLogo() {
                 className="object-contain [transition:none]"
               />
             </div>
-            {open && <div className="ml-2 text-xl font-bold leading-tight">Avara</div>}
+            {open && <div className="text-xl font-bold leading-tight">Avara</div>}
           </Link>
         </SidebarMenuButton>
       </SidebarMenuItem>

@@ -1,4 +1,3 @@
-// src/router.tsx
 import { createBrowserRouter } from 'react-router-dom';
 import Layout from './layouts/layout';
 import Accounts from './pages/Accounts';
