@@ -39,6 +39,13 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
+const chartColors = {
+  deposit: '#4ade80',
+  withdrawal: '#f87171',
+  internal_transfer: '#60a5fa',
+  external_transfer: '#facc15',
+};
+
 export default function SpendingBreakdownChart() {
   const { currency, rate } = useCurrency();
 
@@ -53,11 +60,11 @@ export default function SpendingBreakdownChart() {
     {} as Record<string, number>,
   );
 
-  const chartData = Object.entries(typeTotals).map(([type, amount], index) => ({
+  const chartData = Object.entries(typeTotals).map(([type, amount]) => ({
     type,
     amount,
     formattedLabel: formatCurrency(amount * rate, currency),
-    fill: `var(--color-chart-${index + 1})`,
+    fill: chartColors[type as keyof typeof chartColors],
   }));
 
   return (
