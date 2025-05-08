@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { ArrowUpRight, PiggyBank, Wallet } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { BalanceHistoryChart } from '@/components/Dashboard/BalanceHistoryChart';
@@ -14,8 +13,6 @@ export default function Dashboard() {
   const balance = 1250;
   const spending = 1250;
   const deposits = 1250;
-
-  const [range, setRange] = useState<'30D' | '6M' | '1Y'>('6M');
 
   return (
     <div className="flex flex-col gap-6 py-4">
