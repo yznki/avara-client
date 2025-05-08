@@ -1,5 +1,6 @@
 'use client';
 
+import { useMemo } from 'react';
 import { useCurrency } from '@/context/CurrencyContext';
 import { useTransactionRange } from '@/context/TransactionRangeContext';
 import { format } from 'date-fns';
@@ -25,7 +26,6 @@ const chartConfig = {
 
 export function BalanceHistoryChart() {
   const { currency, rate } = useCurrency();
-
   const { range } = useTransactionRange();
   const filtered = filterTransactionsByRange(mockTransactions, range);
 
@@ -38,11 +38,27 @@ export function BalanceHistoryChart() {
     {} as Record<string, number>,
   );
 
-  const chartData = Object.entries(monthlyData).map(([month, balance]) => ({
-    month: format(new Date(month + '-01'), 'MMMM'),
-    balance: balance * rate,
-    formatted: formatCurrency(balance * rate, currency),
-  }));
+  const chartData = Object.entries(monthlyData)
+    .sort(([a], [b]) => new Date(a).getTime() - new Date(b).getTime())
+    .map(([month, balance]) => ({
+      month: format(new Date(month + '-01'), 'LLLL'),
+      balance: balance * rate,
+      formatted: formatCurrency(balance * rate, currency),
+    }));
+
+  const min = Math.min(...chartData.map((d) => d.balance)) - 500 * rate;
+  const max = Math.max(...chartData.map((d) => d.balance)) + 500 * rate;
+  const step = 500;
+
+  const ticks = useMemo(() => {
+    const roundedMin = Math.floor(min / step) * step;
+    const roundedMax = Math.ceil(max / step) * step;
+    const values = [];
+    for (let i = roundedMin; i <= roundedMax; i += step) {
+      values.push(i);
+    }
+    return values;
+  }, [min, max]);
 
   return (
     <Card>
@@ -52,17 +68,47 @@ export function BalanceHistoryChart() {
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig}>
-          <LineChart data={chartData} margin={{ left: 12, right: 12 }}>
-            <CartesianGrid />
-            <XAxis dataKey="month" tickLine={false} axisLine={false} tickMargin={8} />
-            <YAxis tickLine={false} axisLine={false} tickMargin={10} tick={{ fontSize: 12 }} />
-            <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
+          <LineChart accessibilityLayer data={chartData} margin={{ left: 12, right: 12 }}>
+            <CartesianGrid vertical={false} />
+            <XAxis
+              dataKey="month"
+              tickLine={false}
+              axisLine={false}
+              tickMargin={8}
+              tickFormatter={(value) => value.slice(0, 3)}
+            />
+            <YAxis
+              domain={[min, max]}
+              ticks={ticks}
+              tickLine={false}
+              axisLine={false}
+              tickMargin={10}
+              tick={{ fontSize: 12 }}
+              tickFormatter={(val) =>
+                new Intl.NumberFormat('en-US', {
+                  style: 'currency',
+                  currency,
+                  notation: 'compact', // shows 2K instead of 2,000
+                }).format(val)
+              }
+            />
+            <ChartTooltip
+              cursor={false}
+              content={
+                <ChartTooltipContent formatter={(val) => formatCurrency(Number(val), currency)} />
+              }
+            />
             <Line
               dataKey="balance"
               type="natural"
               stroke="var(--color-balance)"
               strokeWidth={2}
-              dot={true}
+              dot={{
+                fill: 'var(--color-balance)',
+              }}
+              activeDot={{
+                r: 5,
+              }}
             />
           </LineChart>
         </ChartContainer>

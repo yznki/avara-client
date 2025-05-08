@@ -11,7 +11,6 @@ import {
   ChartLegend,
   ChartLegendContent,
   ChartTooltip,
-  ChartTooltipContent,
   type ChartConfig,
 } from '@/components/ui/chart';
 import { mockTransactions } from '../TransactionsDataTable/mockTransactions';
@@ -44,6 +43,21 @@ const chartColors = {
   withdrawal: '#f87171',
   internal_transfer: '#60a5fa',
   external_transfer: '#facc15',
+};
+
+const CustomPieTooltip = ({ active, payload }: { active?: boolean; payload?: any[] }) => {
+  if (!active || !payload || !payload.length) return null;
+
+  const { name, payload: data } = payload[0];
+
+  return (
+    <div className="rounded-md border bg-background px-3 py-2 text-sm shadow-md">
+      <div className="font-medium">
+        {chartConfig[name as keyof typeof chartConfig]?.label ?? name}
+      </div>
+      <div className="text-muted-foreground">{data.formattedLabel}</div>
+    </div>
+  );
 };
 
 export default function SpendingBreakdownChart() {
@@ -106,15 +120,7 @@ export default function SpendingBreakdownChart() {
               content={<ChartLegendContent nameKey="type" />}
               className="flex flex-col gap-2"
             />
-            <ChartTooltip
-              cursor={false}
-              content={
-                <ChartTooltipContent
-                  className="min-w-[140px] px-3 py-2 text-sm rounded-md shadow-md"
-                  hideLabel
-                />
-              }
-            />
+            <ChartTooltip content={<CustomPieTooltip />} />
           </PieChart>
         </ChartContainer>
       </CardContent>
