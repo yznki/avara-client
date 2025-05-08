@@ -1,7 +1,7 @@
 'use client';
 
 import { useCurrency } from '@/context/CurrencyContext';
-import { getCurrencySymbol } from '@/lib/getCurrencySymbol';
+import { getCurrencySymbol } from '@/lib/currencies';
 import { cn } from '@/lib/utils';
 import {
   Select,
