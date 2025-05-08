@@ -2,8 +2,10 @@
 
 import { useCurrency } from '@/context/CurrencyContext';
 import type { ColumnDef } from '@tanstack/react-table';
+import { ArrowUpDown } from 'lucide-react';
 import { formatCurrency } from '@/lib/currencies';
 import { Badge } from '../ui/badge';
+import { Button } from '../ui/button';
 
 export type TransactionTableEntry = {
   id: string;
@@ -18,7 +20,24 @@ export type TransactionTableEntry = {
 export const columns: ColumnDef<TransactionTableEntry>[] = [
   {
     accessorKey: 'date',
-    header: 'Date',
+    header: ({ column }) => (
+      <div className="flex items-center gap-2 px-2">
+        Date
+        <Button
+          variant="ghost"
+          className="p-0 hover:bg-primary/10 hover:cursor-pointer"
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+        >
+          <ArrowUpDown />
+        </Button>
+      </div>
+    ),
+    enableSorting: true,
+    sortingFn: (rowA, rowB, columnId) => {
+      const a = new Date(rowA.getValue(columnId));
+      const b = new Date(rowB.getValue(columnId));
+      return a.getTime() - b.getTime();
+    },
     cell: ({ row }) => {
       const value = row.getValue('date');
 
@@ -41,6 +60,7 @@ export const columns: ColumnDef<TransactionTableEntry>[] = [
   {
     accessorKey: 'type',
     header: 'Type',
+    enableSorting: true,
     cell: ({ row }) => {
       const type = row.getValue('type') as TransactionTableEntry['type'];
 
@@ -60,7 +80,20 @@ export const columns: ColumnDef<TransactionTableEntry>[] = [
   },
   {
     accessorKey: 'amount',
-    header: () => <div className="text-left">Amount</div>,
+    header: ({ column }) => (
+      <div className="flex items-center gap-2 px-2">
+        Amount
+        <Button
+          variant="ghost"
+          className="p-0 hover:bg-primary/10 hover:cursor-pointer"
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+        >
+          <ArrowUpDown />
+        </Button>
+      </div>
+    ),
+    enableSorting: true,
+    sortingFn: 'basic',
     cell: ({ row }) => {
       const { currency, rate } = useCurrency();
 

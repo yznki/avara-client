@@ -1,9 +1,10 @@
+import { useState } from 'react';
 import { ArrowUpRight, PiggyBank, Wallet } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { BalanceHistoryChart } from '@/components/Dashboard/BalanceHistoryChart';
 import { KPI } from '@/components/Dashboard/KPI';
 import SpendingBreakdownChart from '@/components/Dashboard/SpendingBreakdownChart';
-import { mockTransactions } from '@/components/TransactionsDataTable/mockTransactions';
+import { mockTransactionsTableEntries } from '@/components/TransactionsDataTable/mockTransactions';
 import TransactionsDataTable from '@/components/TransactionsDataTable/TransactionsDataTable';
 import { Button } from '@/components/ui/button';
 
@@ -13,6 +14,8 @@ export default function Dashboard() {
   const balance = 1250;
   const spending = 1250;
   const deposits = 1250;
+
+  const [range, setRange] = useState<'30D' | '6M' | '1Y'>('6M');
 
   return (
     <div className="flex flex-col gap-6 py-4">
@@ -46,7 +49,7 @@ export default function Dashboard() {
       <div className="grid gap-2">
         <h2 className="text-lg font-semibold">Recent Transactions</h2>
         <div className="flex flex-col gap-4 sm:hidden">
-          {mockTransactions.slice(0, 5).map((tx) => (
+          {mockTransactionsTableEntries.slice(0, 5).map((tx) => (
             <div key={tx.id} className="rounded-lg border p-4 shadow-sm">
               <div className="flex justify-between text-sm">
                 <span className="font-semibold capitalize">{tx.type.replace('_', ' ')}</span>

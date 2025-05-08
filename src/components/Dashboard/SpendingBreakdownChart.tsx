@@ -1,7 +1,11 @@
 'use client';
 
+import { useCurrency } from '@/context/CurrencyContext';
+import { useTransactionRange } from '@/context/TransactionRangeContext';
 import { Pie, PieChart } from 'recharts';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { formatCurrency } from '@/lib/currencies';
+import { filterTransactionsByRange } from '@/lib/filterTransactionsByRange';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   ChartContainer,
   ChartLegend,
@@ -10,45 +14,57 @@ import {
   ChartTooltipContent,
   type ChartConfig,
 } from '@/components/ui/chart';
-
-const chartData = [
-  { type: 'Withdraw', amount: 720, fill: 'var(--color-chart-1)' },
-  { type: 'Deposit', amount: 920, fill: 'var(--color-chart-2)' },
-  { type: 'Internal T.', amount: 460, fill: 'var(--color-chart-3)' },
-  { type: 'External T.', amount: 310, fill: 'var(--color-chart-4)' },
-];
+import { mockTransactions } from '../TransactionsDataTable/mockTransactions';
+import { ChartRangeToggle } from './ChartRangeToggle';
 
 const chartConfig = {
   amount: {
     label: 'Amount',
   },
-  Withdraw: {
-    label: 'Withdraw',
+  deposit: {
+    label: 'Deposit',
     color: 'var(--chart-1)',
   },
-  Deposit: {
-    label: 'Deposit',
+  withdrawal: {
+    label: 'Withdrawal',
     color: 'var(--chart-2)',
   },
-  'Internal T.': {
-    label: 'Internal T.',
+  internal_transfer: {
+    label: 'Internal Transfer',
     color: 'var(--chart-3)',
   },
-  'External T.': {
-    label: 'External T.',
+  external_transfer: {
+    label: 'External Transfer',
     color: 'var(--chart-4)',
   },
 } satisfies ChartConfig;
 
 export default function SpendingBreakdownChart() {
+  const { currency, rate } = useCurrency();
+
+  const { range } = useTransactionRange();
+  const filtered = filterTransactionsByRange(mockTransactions, range);
+
+  const typeTotals = filtered.reduce(
+    (acc, tx) => {
+      acc[tx.type] = (acc[tx.type] ?? 0) + tx.amount;
+      return acc;
+    },
+    {} as Record<string, number>,
+  );
+
+  const chartData = Object.entries(typeTotals).map(([type, amount], index) => ({
+    type,
+    amount,
+    formattedLabel: formatCurrency(amount * rate, currency),
+    fill: `var(--color-chart-${index + 1})`,
+  }));
+
   return (
-    <Card className="flex flex-col">
-      <CardHeader className="items-center pb-0">
+    <Card>
+      <CardHeader className="flex items-center justify-between pb-0">
         <CardTitle>Spending Breakdown</CardTitle>
-        <CardDescription>
-          January – {new Intl.DateTimeFormat('en-US', { month: 'long' }).format(new Date())}{' '}
-          {new Date().getFullYear()}
-        </CardDescription>
+        <ChartRangeToggle />
       </CardHeader>
       <CardContent className="flex-1 pb-0">
         <ChartContainer config={chartConfig} className="mx-auto min-h-[200px]">
@@ -57,6 +73,7 @@ export default function SpendingBreakdownChart() {
               data={chartData}
               dataKey="amount"
               nameKey="type"
+              innerRadius={64}
               labelLine={false}
               label={({ payload, ...props }) => {
                 return (
@@ -67,13 +84,13 @@ export default function SpendingBreakdownChart() {
                     y={props.y}
                     textAnchor={props.textAnchor}
                     dominantBaseline={props.dominantBaseline}
-                    fill="hsla(var(--foreground))"
+                    fill="hsl(var(--muted-foreground))"
+                    className="text-xs font-semibold"
                   >
-                    {payload.amount}
+                    {payload.formattedLabel}
                   </text>
                 );
               }}
-              innerRadius={64}
             />
             <ChartLegend
               layout="radial"

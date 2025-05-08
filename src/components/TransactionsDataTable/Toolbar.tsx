@@ -19,7 +19,7 @@ type Props = {
 
 export function Toolbar({ onSearchChange, onTypeFilterChange, searchValue, typeFilter }: Props) {
   return (
-    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between py-4">
+    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between pb-2">
       <div className="flex items-center gap-2">
         <Input
           placeholder="Search by note or account..."

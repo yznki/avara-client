@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { DataTable } from '../DataTable/DataTable';
 import { columns } from './Columns';
-import { mockTransactions } from './mockTransactions';
+import { mockTransactionsTableEntries } from './mockTransactions';
 import { Toolbar } from './Toolbar';
 
 function TransactionsDataTable() {
@@ -9,7 +9,7 @@ function TransactionsDataTable() {
   const [typeFilter, setTypeFilter] = useState('all');
 
   const filteredData = useMemo(() => {
-    return mockTransactions.filter((tx) => {
+    return mockTransactionsTableEntries.filter((tx) => {
       const matchesSearch =
         tx.note?.toLowerCase().includes(search.toLowerCase()) ||
         tx.from?.toLowerCase().includes(search.toLowerCase()) ||
@@ -17,7 +17,7 @@ function TransactionsDataTable() {
       const matchesType = typeFilter === 'all' || tx.type === typeFilter;
       return matchesSearch && matchesType;
     });
-  }, [mockTransactions, search, typeFilter]);
+  }, [mockTransactionsTableEntries, search, typeFilter]);
 
   return (
     <div className="hidden sm:block">
