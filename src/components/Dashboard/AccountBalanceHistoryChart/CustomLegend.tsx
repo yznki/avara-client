@@ -4,7 +4,7 @@ export default function CustomLegend({ payload }: LegendProps) {
   if (!payload) return null;
 
   return (
-    <div className="flex gap-4 px-2 pb-4 text-sm items-center w-full justify-center">
+    <div className="hidden md:flex gap-4 px-2 pb-4 text-sm items-center w-full justify-center">
       {payload.map((entry) => (
         <div key={entry.value} className="flex items-center gap-2">
           <span
