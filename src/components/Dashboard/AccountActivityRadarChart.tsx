@@ -5,15 +5,7 @@ import { useCurrency } from '@/context/CurrencyContext';
 import type { AccountResponse } from '@/types/account';
 import type { TransactionResponse } from '@/types/transaction';
 import { TrendingUp } from 'lucide-react';
-import {
-  PolarAngleAxis,
-  PolarGrid,
-  PolarRadiusAxis,
-  Radar,
-  RadarChart,
-  ResponsiveContainer,
-  Tooltip,
-} from 'recharts';
+import { PolarAngleAxis, PolarGrid, PolarRadiusAxis, Radar, RadarChart, Tooltip } from 'recharts';
 import { formatCurrency } from '@/lib/currencies';
 import {
   Card,
@@ -99,33 +91,28 @@ export function AccountActivityRadarChart({ transactions, accounts }: Props) {
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig}>
-          <ResponsiveContainer width="100%" height={400}>
-            <RadarChart data={data}>
-              <PolarGrid />
-              <PolarAngleAxis
-                dataKey="metric"
-                tickFormatter={(label) => label.replace(' ', '\n')}
+          <RadarChart data={data}>
+            <PolarGrid />
+            <PolarAngleAxis dataKey="metric" tickFormatter={(label) => label.replace(' ', '\n')} />
+            <PolarRadiusAxis
+              tickFormatter={(val) => {
+                if (val >= 1_000_000) return `${(val / 1_000_000).toFixed(1)}M`;
+                if (val >= 1_000) return `${(val / 1_000).toFixed(0)}k`;
+                return val.toFixed(0);
+              }}
+            />
+            <Tooltip formatter={(val: number) => formatCurrency(val, currency)} />
+            {(['checking', 'savings', 'investment'] as const).map((type) => (
+              <Radar
+                key={type}
+                name={chartConfig[type].label}
+                dataKey={type}
+                stroke={chartConfig[type].color}
+                fill={chartConfig[type].color}
+                fillOpacity={0.2}
               />
-              <PolarRadiusAxis
-                tickFormatter={(val) => {
-                  if (val >= 1_000_000) return `${(val / 1_000_000).toFixed(1)}M`;
-                  if (val >= 1_000) return `${(val / 1_000).toFixed(0)}k`;
-                  return val.toFixed(0);
-                }}
-              />
-              <Tooltip formatter={(val: number) => formatCurrency(val, currency)} />
-              {(['checking', 'savings', 'investment'] as const).map((type) => (
-                <Radar
-                  key={type}
-                  name={chartConfig[type].label}
-                  dataKey={type}
-                  stroke={chartConfig[type].color}
-                  fill={chartConfig[type].color}
-                  fillOpacity={0.2}
-                />
-              ))}
-            </RadarChart>
-          </ResponsiveContainer>
+            ))}
+          </RadarChart>
         </ChartContainer>
       </CardContent>
       <CardFooter className="flex-col items-start gap-2 text-sm">
