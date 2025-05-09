@@ -21,7 +21,7 @@ function Layout() {
   return (
     <SidebarProvider defaultOpen={defaultOpen}>
       <AppSidebar />
-      <main className="p-4">
+      <main className="p-4 w-full">
         <header className="flex h-6 items-center gap-2">
           <SidebarTrigger />
           <Separator orientation="vertical" />
