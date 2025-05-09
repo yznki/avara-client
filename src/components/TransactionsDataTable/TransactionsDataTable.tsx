@@ -11,9 +11,14 @@ import { Toolbar } from './Toolbar';
 interface TransactionsDataTableProps {
   transactions?: TransactionResponse[];
   accounts: AccountResponse[];
+  initialPageSize?: number;
 }
 
-function TransactionsDataTable({ transactions, accounts }: TransactionsDataTableProps) {
+function TransactionsDataTable({
+  transactions,
+  accounts,
+  initialPageSize = 10,
+}: TransactionsDataTableProps) {
   const { rate, currency } = useCurrency();
 
   const [search, setSearch] = useState('');
@@ -86,7 +91,7 @@ function TransactionsDataTable({ transactions, accounts }: TransactionsDataTable
 
       {/* Desktop table */}
       <div className="hidden sm:block">
-        <DataTable columns={columns} data={filteredData} />
+        <DataTable columns={columns} data={filteredData} initialPageSize={initialPageSize} />
       </div>
 
       {/* Mobile card layout */}
