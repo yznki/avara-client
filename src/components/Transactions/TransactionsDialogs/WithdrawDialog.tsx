@@ -5,6 +5,7 @@ import { mockUserAccounts } from '@/types/account';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
+import { formatCurrency } from '@/lib/currencies';
 import AccountSelect from '@/components/Forms/AccountSelect';
 import { Button } from '@/components/ui/button';
 import {
@@ -25,35 +26,45 @@ import {
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 
-interface DepositDialogProps {
+interface WithdrawDialogProps {
   isVisible: boolean;
   setIsVisible: (isVisible: boolean) => void;
 }
 
-const depositSchema = z.object({
-  account: z.string({ required_error: 'Please select an account' }),
-  amount: z.coerce
-    .number({ required_error: 'Please enter an amount' })
-    .positive()
-    .lte(100000, { message: "We can't deposit that huge amount!" }),
-  note: z.string().optional(),
-});
-
-function DepositDialog({ isVisible, setIsVisible }: DepositDialogProps) {
+function WithdrawDialog({ isVisible, setIsVisible }: WithdrawDialogProps) {
   const { currency, rate } = useCurrency();
 
-  const form = useForm<z.infer<typeof depositSchema>>({
-    resolver: zodResolver(depositSchema),
+  const withdrawSchema = z
+    .object({
+      account: z.string({ required_error: 'Please select an account' }),
+      amount: z.coerce.number({ required_error: 'Please enter an amount' }).positive(),
+      note: z.string().optional(),
+    })
+    .superRefine((data, ctx) => {
+      const account = mockUserAccounts.find((a) => a._id === data.account);
+      if (!account) {
+        ctx.addIssue({
+          code: 'custom',
+          message: 'Selected account not found.',
+          path: ['account'],
+        });
+      } else if (data.amount > account.balance) {
+        ctx.addIssue({
+          code: 'custom',
+          message: `You can't withdraw more than your balance of ${formatCurrency(account.balance * rate, currency)}.`,
+          path: ['amount'],
+        });
+      }
+    });
+
+  const form = useForm<z.infer<typeof withdrawSchema>>({
+    resolver: zodResolver(withdrawSchema),
     defaultValues: { amount: 0 },
   });
 
-  function onSubmit(values: z.infer<typeof depositSchema>) {
-    // Change to USD for API call
+  function onSubmit(values: z.infer<typeof withdrawSchema>) {
     values.amount = values.amount / rate;
-    console.log(values.amount);
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
+    console.log('Withdraw request:', values);
   }
 
   function closeDialog() {
@@ -71,10 +82,10 @@ function DepositDialog({ isVisible, setIsVisible }: DepositDialogProps) {
     >
       <DialogContent onInteractOutside={closeDialog}>
         <DialogHeader>
-          <DialogTitle>Deposit Funds</DialogTitle>
+          <DialogTitle>Withdraw Funds</DialogTitle>
           <DialogDescription>
-            Add money to one of your accounts. Make sure the amount and account are correct before
-            submitting.
+            Withdraw money from one of your accounts. Make sure the amount, method, and destination
+            are correct before submitting.
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -82,20 +93,18 @@ function DepositDialog({ isVisible, setIsVisible }: DepositDialogProps) {
             <FormField
               control={form.control}
               name="amount"
-              render={({ field }) => {
-                return (
-                  <FormItem>
-                    <FormLabel>Amount</FormLabel>
-                    <FormControl>
-                      <div className="flex items-center gap-2">
-                        <span>{currency}</span>
-                        <Input {...field} placeholder="Enter an amount" type="number" />
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                );
-              }}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Amount</FormLabel>
+                  <FormControl>
+                    <div className="flex items-center gap-2">
+                      <span>{currency}</span>
+                      <Input {...field} placeholder="Enter an amount" type="number" />
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
             <FormField
               control={form.control}
@@ -112,7 +121,7 @@ function DepositDialog({ isVisible, setIsVisible }: DepositDialogProps) {
                   <FormLabel>Note</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder="A little something to make you remember this deposit..."
+                      placeholder="What's this withdrawal for?"
                       className="resize-none"
                       {...field}
                     />
@@ -125,7 +134,7 @@ function DepositDialog({ isVisible, setIsVisible }: DepositDialogProps) {
               <Button variant="ghost" type="reset" onClick={closeDialog}>
                 Cancel
               </Button>
-              <Button type="submit">Submit</Button>
+              <Button type="submit">Withdraw</Button>
             </div>
           </form>
         </Form>
@@ -134,4 +143,4 @@ function DepositDialog({ isVisible, setIsVisible }: DepositDialogProps) {
   );
 }
 
-export default DepositDialog;
+export default WithdrawDialog;

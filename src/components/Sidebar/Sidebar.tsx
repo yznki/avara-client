@@ -2,6 +2,7 @@ import * as React from 'react';
 import { useState } from 'react';
 import DepositDialog from '@/components/Transactions/TransactionsDialogs/DepositDialog';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader } from '@/components/ui/sidebar';
+import WithdrawDialog from '../Transactions/TransactionsDialogs/WithdrawDialog';
 import { NavLogo } from './NavLogo';
 import { NavMain } from './NavMain';
 import { NavSecondary } from './NavSecondary';
@@ -10,6 +11,8 @@ import { SidebarNavActionsGroup } from './SidebarNavActionsGroup';
 
 export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
   const [isDepositDialogOpen, setIsDepositDialogOpen] = useState(false);
+  const [isWithdrawDialogOpen, setIsWithdrawDialogOpen] = useState(false);
+  // const [isTransferDialogOpen, setIsTransferDialogOpen] = useState(false);
 
   return (
     <>
@@ -18,15 +21,10 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
           <NavLogo />
         </SidebarHeader>
         <SidebarContent>
-          {/* TODO: When implementing the transactions add the modal control here. */}
           <SidebarNavActionsGroup
             onDeposit={() => setIsDepositDialogOpen(true)}
-            onWithdraw={function (): void {
-              throw new Error('Function not implemented.');
-            }}
-            onTransfer={function (): void {
-              throw new Error('Function not implemented.');
-            }}
+            onWithdraw={() => setIsWithdrawDialogOpen(true)}
+            onTransfer={() => {}}
           />
           <NavMain />
           <NavSecondary />
@@ -42,13 +40,8 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
           />
         </SidebarFooter>
       </Sidebar>
-      <DepositDialog
-        isVisible={isDepositDialogOpen}
-        setIsVisible={setIsDepositDialogOpen}
-        onConfirm={function (): void {
-          throw new Error('Function not implemented.');
-        }}
-      />
+      <DepositDialog isVisible={isDepositDialogOpen} setIsVisible={setIsDepositDialogOpen} />
+      <WithdrawDialog isVisible={isWithdrawDialogOpen} setIsVisible={setIsWithdrawDialogOpen} />
     </>
   );
 }
