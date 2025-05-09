@@ -17,7 +17,7 @@ const buttonVariants = cva(
         ghost: 'hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50',
         link: 'text-primary underline-offset-4 hover:underline',
         sidebar:
-          'border border-sidebar-primary bg-[#0052CC0D] text-sidebar-primary hover:bg-sidebar-primary/15 transition-colors duration-300 hover:cursor-pointer dark:bg-sidebar-primary/10 dark:text-sidebar-primary dark:hover:bg-sidebar-primary/15 dark:hover:text-sidebar-primary-foreground',
+          'border border-sidebar-primary bg-[#0052CC0D] text-primary hover:bg-sidebar-primary/15 transition-colors duration-300 hover:cursor-pointer dark:bg-sidebar-primary/10 dark:text-sidebar-primary dark:hover:bg-sidebar-primary/15 dark:hover:text-sidebar-primary-foreground',
       },
       size: {
         default: 'h-9 px-4 py-2 has-[>svg]:px-3',

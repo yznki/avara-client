@@ -1,31 +1,54 @@
-export enum EAccountType {
-  Checking = 'checking',
-  Savings = 'savings',
-  Investment = 'investment',
-}
+export type AccountType = 'checking' | 'savings' | 'investment';
 
 export interface AccountResponse {
   _id: string;
   userId: string;
-  type: EAccountType;
+  type: AccountType;
   balance: number;
   createdAt: Date;
   updatedAt: Date;
 }
 
-export function getAccountName(accountType: string | EAccountType): string {
+export function getAccountName(accountType: string | AccountType): string {
   if (typeof accountType === 'string') {
-    accountType = accountType.toLowerCase() as EAccountType;
+    accountType = accountType.toLowerCase() as AccountType;
   }
 
   switch (accountType) {
-    case EAccountType.Checking:
+    case 'checking':
       return 'Checking';
-    case EAccountType.Savings:
+    case 'savings':
       return 'Savings';
-    case EAccountType.Investment:
+    case 'investment':
       return 'Investment';
     default:
       return 'Unknown Account Type';
   }
 }
+
+export const mockUserAccounts: AccountResponse[] = [
+  {
+    _id: '1',
+    userId: 'user1',
+    type: 'checking',
+    balance: 5000,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  },
+  {
+    _id: '2',
+    userId: 'user1',
+    type: 'savings',
+    balance: 15000,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  },
+  {
+    _id: '3',
+    userId: 'user1',
+    type: 'investment',
+    balance: -2000,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  },
+];
