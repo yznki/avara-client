@@ -3,7 +3,7 @@
 import { useCurrency } from '@/context/CurrencyContext';
 import { useTransactionRange } from '@/context/TransactionRangeContext';
 import { Wallet } from 'lucide-react';
-import { Pie, PieChart } from 'recharts';
+import { Legend, Pie, PieChart } from 'recharts';
 import { formatCurrency } from '@/lib/currencies';
 import { filterTransactionsByRange } from '@/lib/filterTransactionsByRange';
 import {
@@ -14,14 +14,9 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import {
-  ChartContainer,
-  ChartLegend,
-  ChartLegendContent,
-  ChartTooltip,
-  type ChartConfig,
-} from '@/components/ui/chart';
+import { ChartContainer, ChartTooltip, type ChartConfig } from '@/components/ui/chart';
 import { mockTransactions } from '../TransactionsDataTable/mockTransactions';
+import CustomLegend from './AccountBalanceHistoryChart/CustomLegend';
 import { ChartRangeToggle } from './ChartRangeToggle';
 
 const chartConfig = {
@@ -82,8 +77,10 @@ export default function SpendingBreakdownChart() {
     {} as Record<string, number>,
   );
 
+  const formatTypeLabel = (type: string) => chartConfig[type as keyof typeof chartConfig].label;
+
   const chartData = Object.entries(typeTotals).map(([type, amount]) => ({
-    type,
+    type: formatTypeLabel(type),
     amount,
     formattedLabel: formatCurrency(amount * rate, currency),
     fill: chartColors[type as keyof typeof chartColors],
@@ -124,12 +121,12 @@ export default function SpendingBreakdownChart() {
                 );
               }}
             />
-            <ChartLegend
-              layout="radial"
-              verticalAlign="middle"
-              align="right"
-              content={<ChartLegendContent nameKey="type" />}
-              className="md:flex flex-col gap-2 hidden"
+            <Legend
+              verticalAlign="top"
+              align="center"
+              iconType="circle"
+              wrapperStyle={{ fontSize: '0.75rem', paddingBottom: 16 }}
+              content={<CustomLegend />}
             />
             <ChartTooltip content={<CustomPieTooltip />} />
           </PieChart>

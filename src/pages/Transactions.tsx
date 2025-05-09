@@ -45,7 +45,11 @@ export default function Transactions() {
             ))}
           </div>
         </div>
-        <TransactionsDataTable accounts={mockUserAccounts} transactions={mockTransactions} />
+        <TransactionsDataTable
+          accounts={mockUserAccounts}
+          transactions={mockTransactions}
+          initialPageSize={50}
+        />
       </div>
 
       <DepositDialog isVisible={isDepositDialogVisible} setIsVisible={setIsDepositDialogVisible} />
