@@ -88,7 +88,7 @@ export function BalanceHistoryChart() {
                 new Intl.NumberFormat('en-US', {
                   style: 'currency',
                   currency,
-                  notation: 'compact', // shows 2K instead of 2,000
+                  notation: 'compact',
                 }).format(val)
               }
             />

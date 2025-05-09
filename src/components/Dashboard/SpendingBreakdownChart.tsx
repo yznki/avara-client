@@ -118,7 +118,7 @@ export default function SpendingBreakdownChart() {
               verticalAlign="middle"
               align="right"
               content={<ChartLegendContent nameKey="type" />}
-              className="flex flex-col gap-2"
+              className="md:flex flex-col gap-2 hidden"
             />
             <ChartTooltip content={<CustomPieTooltip />} />
           </PieChart>
