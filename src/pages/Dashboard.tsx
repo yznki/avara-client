@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { BalanceHistoryChart } from '@/components/Dashboard/BalanceHistoryChart';
 import { KPI } from '@/components/Dashboard/KPI';
 import SpendingBreakdownChart from '@/components/Dashboard/SpendingBreakdownChart';
-import { mockTransactionsTableEntries } from '@/components/TransactionsDataTable/mockTransactions';
+import { mockTransactions } from '@/components/TransactionsDataTable/mockTransactions';
 import TransactionsDataTable from '@/components/TransactionsDataTable/TransactionsDataTable';
 import { Button } from '@/components/ui/button';
 
@@ -46,8 +46,8 @@ export default function Dashboard() {
       <div className="grid gap-2">
         <h2 className="text-lg font-semibold">Recent Transactions</h2>
         <div className="flex flex-col gap-4 sm:hidden">
-          {mockTransactionsTableEntries.slice(0, 5).map((tx) => (
-            <div key={tx.id} className="rounded-lg border p-4 shadow-sm">
+          {mockTransactions.slice(0, 5).map((tx) => (
+            <div key={tx._id} className="rounded-lg border p-4 shadow-sm">
               <div className="flex justify-between text-sm">
                 <span className="font-semibold capitalize">{tx.type.replace('_', ' ')}</span>
                 <span className="text-muted-foreground">
@@ -56,7 +56,7 @@ export default function Dashboard() {
                     day: '2-digit',
                     hour: '2-digit',
                     minute: '2-digit',
-                  }).format(new Date(tx.date))}
+                  }).format(new Date(tx.createdAt))}
                 </span>
               </div>
               <div className="mt-2 text-lg font-bold">{tx.amount.toLocaleString()} ₩</div>
@@ -69,7 +69,7 @@ export default function Dashboard() {
             View Full Transaction History
           </Button>
         </div>
-        <TransactionsDataTable />
+        <TransactionsDataTable accounts={[]} transactions={mockTransactions} />
       </div>
     </div>
   );
