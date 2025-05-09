@@ -1,3 +1,5 @@
+import type { AccountResponse } from './account';
+
 export type TransactionType = 'deposit' | 'withdrawal' | 'internal_transfer' | 'external_transfer';
 
 export interface TransactionResponse {
@@ -9,4 +11,10 @@ export interface TransactionResponse {
   note?: string;
   createdAt: Date | string;
   updatedAt: Date | string;
+}
+
+export interface DepositRequest {
+  account: AccountResponse;
+  amount: number;
+  note: string;
 }

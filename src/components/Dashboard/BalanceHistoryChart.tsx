@@ -4,10 +4,18 @@ import { useMemo } from 'react';
 import { useCurrency } from '@/context/CurrencyContext';
 import { useTransactionRange } from '@/context/TransactionRangeContext';
 import { format } from 'date-fns';
+import { Activity } from 'lucide-react';
 import { CartesianGrid, Line, LineChart, XAxis, YAxis } from 'recharts';
 import { formatCurrency } from '@/lib/currencies';
 import { filterTransactionsByRange } from '@/lib/filterTransactionsByRange';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import {
   ChartContainer,
   ChartTooltip,
@@ -63,7 +71,10 @@ export function BalanceHistoryChart() {
   return (
     <Card>
       <CardHeader className="flex items-center justify-between pb-0">
-        <CardTitle>Balance History</CardTitle>
+        <div className="space-y-1">
+          <CardTitle>Balance History</CardTitle>
+          <CardDescription>Net transaction value by month based on filtered range</CardDescription>
+        </div>
         <ChartRangeToggle />
       </CardHeader>
       <CardContent>
@@ -115,6 +126,14 @@ export function BalanceHistoryChart() {
           </LineChart>
         </ChartContainer>
       </CardContent>
+      <CardFooter className="flex-col items-start gap-2 text-sm">
+        <div className="flex gap-2 font-medium leading-none">
+          Monthly transaction movement <Activity className="h-4 w-4" />
+        </div>
+        <div className="text-muted-foreground">
+          Based on transaction totals (withdrawals reduce balance)
+        </div>
+      </CardFooter>
     </Card>
   );
 }

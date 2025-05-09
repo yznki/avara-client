@@ -2,10 +2,18 @@
 
 import { useCurrency } from '@/context/CurrencyContext';
 import { useTransactionRange } from '@/context/TransactionRangeContext';
+import { Wallet } from 'lucide-react';
 import { Pie, PieChart } from 'recharts';
 import { formatCurrency } from '@/lib/currencies';
 import { filterTransactionsByRange } from '@/lib/filterTransactionsByRange';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import {
   ChartContainer,
   ChartLegend,
@@ -84,7 +92,10 @@ export default function SpendingBreakdownChart() {
   return (
     <Card>
       <CardHeader className="flex items-center justify-between pb-0">
-        <CardTitle>Spending Breakdown</CardTitle>
+        <div className="space-y-1">
+          <CardTitle>Spending Breakdown</CardTitle>
+          <CardDescription>Breakdown of transaction types based on total value</CardDescription>
+        </div>
         <ChartRangeToggle />
       </CardHeader>
       <CardContent className="flex-1 pb-0">
@@ -124,6 +135,14 @@ export default function SpendingBreakdownChart() {
           </PieChart>
         </ChartContainer>
       </CardContent>
+      <CardFooter className="flex-col items-start gap-2 text-sm">
+        <div className="flex items-center gap-2 font-medium leading-none">
+          Spending patterns by type <Wallet className="h-4 w-4" />
+        </div>
+        <div className="text-muted-foreground">
+          Includes all deposits, withdrawals, and transfers for the selected range
+        </div>
+      </CardFooter>
     </Card>
   );
 }

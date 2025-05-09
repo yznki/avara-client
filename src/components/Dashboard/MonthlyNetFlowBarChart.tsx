@@ -5,7 +5,7 @@ import { useCurrency } from '@/context/CurrencyContext';
 import type { TransactionResponse } from '@/types/transaction';
 import { format } from 'date-fns';
 import { TrendingUp } from 'lucide-react';
-import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+import { Bar, BarChart, CartesianGrid, Tooltip, XAxis, YAxis } from 'recharts';
 import { formatCurrency } from '@/lib/currencies';
 import {
   Card,
@@ -85,27 +85,25 @@ export function MonthlyNetFlowBarChart({ transactions }: Props) {
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig}>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={data} margin={{ left: 12, right: 12 }}>
-              <CartesianGrid vertical={false} strokeDasharray="3 3" />
-              <XAxis dataKey="month" tickLine={false} axisLine={false} tickMargin={8} />
-              <YAxis
-                tickLine={false}
-                axisLine={false}
-                tickMargin={8}
-                tickFormatter={(val) => {
-                  if (Math.abs(val) >= 1_000_000) return `${(val / 1_000_000).toFixed(1)}M`;
-                  if (Math.abs(val) >= 1_000) return `${(val / 1_000).toFixed(0)}k`;
-                  return val.toFixed(0);
-                }}
-              />
-              <Tooltip
-                cursor={{ fill: 'hsl(var(--muted))' }}
-                formatter={(value: number) => formatCurrency(value * rate, currency)}
-              />
-              <Bar dataKey="net" radius={[4, 4, 0, 0]} isAnimationActive={true} fill="#000" />
-            </BarChart>
-          </ResponsiveContainer>
+          <BarChart data={data} margin={{ left: 12, right: 12 }}>
+            <CartesianGrid vertical={false} strokeDasharray="3 3" />
+            <XAxis dataKey="month" tickLine={false} axisLine={false} tickMargin={8} />
+            <YAxis
+              tickLine={false}
+              axisLine={false}
+              tickMargin={8}
+              tickFormatter={(val) => {
+                if (Math.abs(val) >= 1_000_000) return `${(val / 1_000_000).toFixed(1)}M`;
+                if (Math.abs(val) >= 1_000) return `${(val / 1_000).toFixed(0)}k`;
+                return val.toFixed(0);
+              }}
+            />
+            <Tooltip
+              cursor={{ fill: 'hsl(var(--muted))' }}
+              formatter={(value: number) => formatCurrency(value * rate, currency)}
+            />
+            <Bar dataKey="net" radius={[4, 4, 0, 0]} isAnimationActive={true} fill="#000" />
+          </BarChart>
         </ChartContainer>
       </CardContent>
       <CardFooter>

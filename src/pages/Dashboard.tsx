@@ -38,12 +38,12 @@ export default function Dashboard() {
           isCurrency
         />
       </div>
-      <div className="grid gap-8 sm:grid-cols-1 lg:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-1 lg:grid-cols-3">
         <AccountBalanceHistoryChart transactions={mockTransactions} accounts={mockUserAccounts} />
         <MonthlyNetFlowBarChart transactions={mockTransactions} />
         <AccountActivityRadarChart transactions={mockTransactions} accounts={mockUserAccounts} />
       </div>
-      <div className="grid gap-8 sm:grid-cols-1 lg:grid-cols-2">
+      <div className="grid gap-4 sm:grid-cols-1 lg:grid-cols-2">
         <BalanceHistoryChart />
         <SpendingBreakdownChart />
       </div>
