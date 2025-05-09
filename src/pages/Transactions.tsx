@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { mockUserAccounts } from '@/types/account';
 import { ArrowDownToLine, ArrowUpToLine, Banknote } from 'lucide-react';
 import DepositDialog from '@/components/Transactions/TransactionsDialogs/DepositDialog';
+import TransferDialog from '@/components/Transactions/TransactionsDialogs/TransferDialog/TransferDialog';
 import WithdrawDialog from '@/components/Transactions/TransactionsDialogs/WithdrawDialog';
 import { mockTransactions } from '@/components/TransactionsDataTable/mockTransactions';
 import TransactionsDataTable from '@/components/TransactionsDataTable/TransactionsDataTable';
@@ -10,7 +11,7 @@ import { Button } from '@/components/ui/button';
 export default function Transactions() {
   const [isDepositDialogVisible, setIsDepositDialogVisible] = useState(false);
   const [isWithdrawDialogVisible, setIsWithdrawDialogVisible] = useState(false);
-  // const [isTransferDialogVisible, setIsTransferDialogVisible] = useState(false);
+  const [isTransferDialogVisible, setIsTransferDialogVisible] = useState(false);
 
   const actions = [
     {
@@ -26,10 +27,7 @@ export default function Transactions() {
     {
       label: 'Transfer',
       icon: <Banknote className="size-4" />,
-      onClick: () => {
-        // Handle transfer action
-        console.log('Transfer clicked');
-      },
+      onClick: () => setIsTransferDialogVisible(true),
     },
   ];
 
@@ -54,6 +52,10 @@ export default function Transactions() {
       <WithdrawDialog
         isVisible={isWithdrawDialogVisible}
         setIsVisible={setIsWithdrawDialogVisible}
+      />
+      <TransferDialog
+        isVisible={isTransferDialogVisible}
+        setIsVisible={setIsTransferDialogVisible}
       />
     </>
   );
