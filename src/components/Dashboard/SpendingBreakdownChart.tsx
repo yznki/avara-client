@@ -39,10 +39,10 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 const chartColors = {
-  deposit: '#4ade80',
-  withdrawal: '#f87171',
-  internal_transfer: '#60a5fa',
-  external_transfer: '#facc15',
+  deposit: '#4567b7',
+  withdrawal: '#6495ed',
+  internal_transfer: '#7fa6e6',
+  external_transfer: '#9ac1f2',
 };
 
 const CustomPieTooltip = ({ active, payload }: { active?: boolean; payload?: any[] }) => {

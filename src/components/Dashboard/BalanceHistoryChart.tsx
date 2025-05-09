@@ -95,7 +95,9 @@ export function BalanceHistoryChart() {
             <ChartTooltip
               cursor={false}
               content={
-                <ChartTooltipContent formatter={(val) => formatCurrency(Number(val), currency)} />
+                <ChartTooltipContent
+                  formatter={(val) => formatCurrency(Number(val) * rate, currency)}
+                />
               }
             />
             <Line
