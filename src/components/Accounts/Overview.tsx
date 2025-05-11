@@ -28,9 +28,10 @@ function Overview({ account, userTransactions, onDelete }: OverviewProps) {
 
   const canDelete = account.accountType !== 'checking';
 
-  const filteredTransactions = userTransactions.filter((tx) => {
-    tx.fromAccountId === account._id;
-  });
+  const filteredTransactions = userTransactions.filter(
+    (tx) =>
+      tx.fromAccountId === account._id || (tx.toAccountId === account._id && tx.type == 'deposit'),
+  );
 
   const depositsThisMonth = userTransactions.reduce((acc, tx) => {
     if (tx.type === 'deposit') {
