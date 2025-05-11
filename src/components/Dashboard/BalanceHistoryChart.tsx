@@ -34,6 +34,7 @@ const chartConfig = {
 
 export function BalanceHistoryChart() {
   const { currency, rate } = useCurrency();
+
   const { range } = useTransactionRange();
   const filtered = filterTransactionsByRange(mockTransactions, range);
 

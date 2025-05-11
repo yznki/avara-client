@@ -1,5 +1,7 @@
 'use client';
 
+import { useUserContext } from '@/context/UserContext';
+import { useAuth0 } from '@auth0/auth0-react';
 import { BadgeCheck, ChevronsUpDown, LogOut } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
@@ -28,6 +30,14 @@ export function NavUser({
   };
 }) {
   const { isMobile, open } = useSidebar();
+  const { logout } = useAuth0();
+  const { reset } = useUserContext();
+
+  const onLogout = () => {
+    localStorage.clear();
+    reset();
+    logout({ logoutParams: { returnTo: window.location.origin } });
+  };
 
   return (
     <SidebarMenu>
@@ -80,7 +90,7 @@ export function NavUser({
               <DropdownMenuItem>Made By Yazan Kiswani ;)</DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem variant="destructive" onClick={() => alert('Coming soon!')}>
+            <DropdownMenuItem variant="destructive" onClick={onLogout}>
               <LogOut />
               Log out
             </DropdownMenuItem>
