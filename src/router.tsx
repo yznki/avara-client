@@ -1,18 +1,29 @@
 import { createBrowserRouter } from 'react-router-dom';
+import ErrorState from './components/Authentication/ErrorState';
+import FullPageSpinner from './components/Authentication/FullPageSpinner';
+import AuthGuard from './components/AuthGaurd';
 import { TransactionRangeProvider } from './context/TransactionRangeContext';
 import Layout from './layouts/layout';
 import Accounts from './pages/Accounts';
-import Login from './pages/Auth/Login';
-import ResetPassword from './pages/Auth/ResetPassword';
-import SignUp from './pages/Auth/SignUp';
-import VerifyEmail from './pages/Auth/VerifyEmail';
 import Dashboard from './pages/Dashboard';
 import Transactions from './pages/Transactions';
 
 export const router = createBrowserRouter([
   {
+    path: '/loading',
+    element: <FullPageSpinner />,
+  },
+  {
+    path: '/error',
+    element: <ErrorState message="Something went wrong loading your data." />,
+  },
+  {
     path: '/',
-    element: <Layout />,
+    element: (
+      <AuthGuard>
+        <Layout />
+      </AuthGuard>
+    ),
     children: [
       {
         index: true,
@@ -25,22 +36,6 @@ export const router = createBrowserRouter([
       { path: 'accounts', element: <Accounts /> },
       { path: 'transactions', element: <Transactions /> },
     ],
-  },
-  {
-    path: '/sign-up',
-    element: <SignUp />,
-  },
-  {
-    path: '/login',
-    element: <Login />,
-  },
-  {
-    path: '/reset-password',
-    element: <ResetPassword />,
-  },
-  {
-    path: '/verify-email',
-    element: <VerifyEmail />,
   },
   {
     path: '*',
