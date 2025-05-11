@@ -1,9 +1,11 @@
 import { useMemo } from 'react';
+import { useCurrency } from '@/context/CurrencyContext';
 import type { AccountResponse, AccountType } from '@/types/account';
 import type { TransactionResponse } from '@/types/transaction';
 import { format } from 'date-fns';
 import { TrendingUp } from 'lucide-react';
 import { Area, AreaChart, CartesianGrid, Legend, XAxis, YAxis } from 'recharts';
+import { abbreviateNumber, getCurrencySymbol } from '@/lib/currencies';
 import {
   Card,
   CardContent,
@@ -22,6 +24,8 @@ interface Props {
 }
 
 export function AccountBalanceHistoryChart({ transactions, accounts }: Props) {
+  const { currency, rate } = useCurrency();
+
   const { chartData, rangeLabel } = useMemo(() => {
     if (transactions.length === 0) return { chartData: [], rangeLabel: 'No data' };
 
@@ -97,9 +101,9 @@ export function AccountBalanceHistoryChart({ transactions, accounts }: Props) {
                 axisLine={false}
                 tickMargin={8}
                 tickFormatter={(val) => {
-                  if (Math.abs(val) >= 1_000_000) return `${(val / 1_000_000).toFixed(1)}M`;
-                  if (Math.abs(val) >= 1_000) return `${(val / 1_000).toFixed(1)}k`;
-                  return val.toFixed(0);
+                  const shortened = abbreviateNumber(val * rate);
+                  const symbol = getCurrencySymbol(currency);
+                  return `${symbol}${shortened}`;
                 }}
               />
               <XAxis dataKey="month" tickLine={false} axisLine={false} tickMargin={8} />
