@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import { getCookie } from '@/lib/cookies';
 import { AppSidebar } from '@/components/Sidebar/Sidebar';
@@ -17,6 +18,10 @@ function Layout() {
   const location = useLocation();
   const segment = location.pathname.split('/').filter(Boolean).pop() ?? '';
   const pageTitle = pageTitles[segment] || 'Page';
+
+  useEffect(() => {
+    document.title = `Avara | ${pageTitle}`;
+  }, [pageTitle]);
 
   return (
     <SidebarProvider defaultOpen={defaultOpen}>
