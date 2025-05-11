@@ -26,7 +26,7 @@ interface OverviewProps {
 function Overview({ account, userTransactions, onDelete }: OverviewProps) {
   const { currency, rate } = useCurrency();
 
-  const canDelete = account.type !== 'checking';
+  const canDelete = account.accountType !== 'checking';
 
   const filteredTransactions = userTransactions.filter((tx) => {
     tx.fromAccountId === account._id;
@@ -49,7 +49,7 @@ function Overview({ account, userTransactions, onDelete }: OverviewProps) {
   return (
     <div className="space-y-4">
       <div className="flex gap-2 items-center">
-        <h2 className="text-2xl font-bold">{getAccountName(account.type)}</h2>
+        <h2 className="text-2xl font-bold">{getAccountName(account.accountType)}</h2>
         {canDelete && onDelete && (
           <AlertDialog>
             <AlertDialogTrigger className="bg-red-500 hover:bg-red-600 hover:cursor-pointer p-1 text-white rounded-sm">

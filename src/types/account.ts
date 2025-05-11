@@ -3,7 +3,7 @@ export type AccountType = 'checking' | 'savings' | 'investment';
 export interface AccountResponse {
   _id: string;
   userId: string;
-  type: AccountType;
+  accountType: AccountType;
   balance: number;
   createdAt: Date;
   updatedAt: Date;
@@ -30,7 +30,7 @@ export const mockUserAccounts: AccountResponse[] = [
   {
     _id: '1',
     userId: 'user1',
-    type: 'checking',
+    accountType: 'checking',
     balance: 5000,
     createdAt: new Date(),
     updatedAt: new Date(),
@@ -38,7 +38,7 @@ export const mockUserAccounts: AccountResponse[] = [
   {
     _id: '2',
     userId: 'user1',
-    type: 'savings',
+    accountType: 'savings',
     balance: 15000,
     createdAt: new Date(),
     updatedAt: new Date(),
@@ -46,7 +46,7 @@ export const mockUserAccounts: AccountResponse[] = [
   {
     _id: '3',
     userId: 'user1',
-    type: 'investment',
+    accountType: 'investment',
     balance: -2000,
     createdAt: new Date(),
     updatedAt: new Date(),

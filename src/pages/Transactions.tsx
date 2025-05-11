@@ -1,14 +1,15 @@
 import { useState } from 'react';
-import { mockUserAccounts } from '@/types/account';
+import { useUserContext } from '@/context/UserContext';
 import { ArrowDownToLine, ArrowUpToLine, Banknote } from 'lucide-react';
 import DepositDialog from '@/components/Transactions/TransactionsDialogs/DepositDialog';
 import TransferDialog from '@/components/Transactions/TransactionsDialogs/TransferDialog/TransferDialog';
 import WithdrawDialog from '@/components/Transactions/TransactionsDialogs/WithdrawDialog';
-import { mockTransactions } from '@/components/TransactionsDataTable/mockTransactions';
 import TransactionsDataTable from '@/components/TransactionsDataTable/TransactionsDataTable';
 import { Button } from '@/components/ui/button';
 
 export default function Transactions() {
+  const { transactions, accounts } = useUserContext();
+
   const [isDepositDialogVisible, setIsDepositDialogVisible] = useState(false);
   const [isWithdrawDialogVisible, setIsWithdrawDialogVisible] = useState(false);
   const [isTransferDialogVisible, setIsTransferDialogVisible] = useState(false);
@@ -46,8 +47,8 @@ export default function Transactions() {
           </div>
         </div>
         <TransactionsDataTable
-          accounts={mockUserAccounts}
-          transactions={mockTransactions}
+          accounts={accounts}
+          transactions={transactions}
           initialPageSize={50}
         />
       </div>

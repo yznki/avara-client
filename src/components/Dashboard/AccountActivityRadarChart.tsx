@@ -49,21 +49,21 @@ export function AccountActivityRadarChart({ transactions, accounts }: Props) {
       const toAcc = accounts.find((a) => a._id === tx.toAccountId);
 
       if (tx.type === 'deposit' && toAcc) {
-        result[getTypeIndex('Deposit')][toAcc.type] += tx.amount;
+        result[getTypeIndex('Deposit')][toAcc.accountType] += tx.amount;
       }
 
       if (tx.type === 'withdrawal' && fromAcc) {
-        result[getTypeIndex('Withdrawal')][fromAcc.type] += tx.amount;
+        result[getTypeIndex('Withdrawal')][fromAcc.accountType] += tx.amount;
       }
 
       if (tx.type === 'internal_transfer') {
-        if (fromAcc) result[getTypeIndex('Internal Sent')][fromAcc.type] += tx.amount;
-        if (toAcc) result[getTypeIndex('Internal Received')][toAcc.type] += tx.amount;
+        if (fromAcc) result[getTypeIndex('Internal Sent')][fromAcc.accountType] += tx.amount;
+        if (toAcc) result[getTypeIndex('Internal Received')][toAcc.accountType] += tx.amount;
       }
 
       if (tx.type === 'external_transfer') {
-        if (fromAcc) result[getTypeIndex('External Sent')][fromAcc.type] += tx.amount;
-        if (toAcc) result[getTypeIndex('External Received')][toAcc.type] += tx.amount;
+        if (fromAcc) result[getTypeIndex('External Sent')][fromAcc.accountType] += tx.amount;
+        if (toAcc) result[getTypeIndex('External Received')][toAcc.accountType] += tx.amount;
       }
     }
 
@@ -81,6 +81,8 @@ export function AccountActivityRadarChart({ transactions, accounts }: Props) {
     investment: { label: 'Investment', color: 'var(--chart-5)' },
   };
 
+  const isEmpty = data.every((d) => d.checking === 0 && d.savings === 0 && d.investment === 0);
+
   return (
     <Card>
       <CardHeader>
@@ -90,34 +92,45 @@ export function AccountActivityRadarChart({ transactions, accounts }: Props) {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={chartConfig}>
-          <RadarChart data={data}>
-            <PolarGrid />
-            <PolarAngleAxis dataKey="metric" tickFormatter={(label) => label.replace(' ', '\n')} />
-            <PolarRadiusAxis
-              tickFormatter={(val) => {
-                if (val >= 1_000_000) return `${(val / 1_000_000).toFixed(1)}M`;
-                if (val >= 1_000) return `${(val / 1_000).toFixed(0)}k`;
-                return val.toFixed(0);
-              }}
-            />
-            <Tooltip formatter={(val: number) => formatCurrency(val, currency)} />
-            {(['checking', 'savings', 'investment'] as const).map((type) => (
-              <Radar
-                key={type}
-                name={chartConfig[type].label}
-                dataKey={type}
-                stroke={chartConfig[type].color}
-                fill={chartConfig[type].color}
-                fillOpacity={0.2}
+        {isEmpty ? (
+          <div className="flex flex-col items-center justify-center text-muted-foreground text-sm h-64 animate-fade-in">
+            <img src="/empty-states/empty-graph-3.svg" alt="No data" className="w-64 h-40 mb-4" />
+            <span>No account activity to display yet.</span>
+          </div>
+        ) : (
+          <ChartContainer config={chartConfig}>
+            <RadarChart data={data}>
+              <PolarGrid />
+              <PolarAngleAxis
+                dataKey="metric"
+                tickFormatter={(label) => label.replace(' ', '\n')}
               />
-            ))}
-          </RadarChart>
-        </ChartContainer>
+              <PolarRadiusAxis
+                tickFormatter={(val) => {
+                  if (val >= 1_000_000) return `${(val / 1_000_000).toFixed(1)}M`;
+                  if (val >= 1_000) return `${(val / 1_000).toFixed(0)}k`;
+                  return val.toFixed(0);
+                }}
+              />
+              <Tooltip formatter={(val: number) => formatCurrency(val, currency)} />
+              {(['checking', 'savings', 'investment'] as const).map((type) => (
+                <Radar
+                  key={type}
+                  name={chartConfig[type].label}
+                  dataKey={type}
+                  stroke={chartConfig[type].color}
+                  fill={chartConfig[type].color}
+                  fillOpacity={0.2}
+                />
+              ))}
+            </RadarChart>
+          </ChartContainer>
+        )}
       </CardContent>
       <CardFooter className="flex-col items-start gap-2 text-sm">
         <div className="flex gap-2 font-medium leading-none">
-          Most used account types per activity <TrendingUp className="h-4 w-4" />
+          {isEmpty ? 'No account usage yet' : 'Most used account types per activity'}
+          <TrendingUp className="h-4 w-4" />
         </div>
         <div className="leading-none text-muted-foreground">
           Aggregated totals by transaction type and account

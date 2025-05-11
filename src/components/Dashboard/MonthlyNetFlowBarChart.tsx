@@ -84,33 +84,45 @@ export function MonthlyNetFlowBarChart({ transactions }: Props) {
         <CardDescription>Shows monthly net cash movement (inflows - outflows)</CardDescription>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={chartConfig}>
-          <BarChart data={data} margin={{ left: 12, right: 12 }}>
-            <CartesianGrid vertical={false} strokeDasharray="3 3" />
-            <XAxis dataKey="month" tickLine={false} axisLine={false} tickMargin={8} />
-            <YAxis
-              tickLine={false}
-              axisLine={false}
-              tickMargin={8}
-              tickFormatter={(val) => {
-                if (Math.abs(val) >= 1_000_000) return `${(val / 1_000_000).toFixed(1)}M`;
-                if (Math.abs(val) >= 1_000) return `${(val / 1_000).toFixed(0)}k`;
-                return val.toFixed(0);
-              }}
+        {data.length === 0 ? (
+          <div className="flex flex-col items-center justify-center text-muted-foreground text-sm h-64 animate-fade-in">
+            <img
+              src="/empty-states/empty-graph-5.svg"
+              alt="No transactions"
+              className="w-64 h-40 mb-4"
             />
-            <Tooltip
-              cursor={{ fill: 'hsl(var(--muted))' }}
-              formatter={(value: number) => formatCurrency(value * rate, currency)}
-            />
-            <Bar dataKey="net" radius={[4, 4, 0, 0]} isAnimationActive={true} fill="#000" />
-          </BarChart>
-        </ChartContainer>
+            <span>No transaction flow data available.</span>
+          </div>
+        ) : (
+          <ChartContainer config={chartConfig}>
+            <BarChart data={data} margin={{ left: 12, right: 12 }}>
+              <CartesianGrid vertical={false} strokeDasharray="3 3" />
+              <XAxis dataKey="month" tickLine={false} axisLine={false} tickMargin={8} />
+              <YAxis
+                tickLine={false}
+                axisLine={false}
+                tickMargin={8}
+                tickFormatter={(val) => {
+                  if (Math.abs(val) >= 1_000_000) return `${(val / 1_000_000).toFixed(1)}M`;
+                  if (Math.abs(val) >= 1_000) return `${(val / 1_000).toFixed(0)}k`;
+                  return val.toFixed(0);
+                }}
+              />
+              <Tooltip
+                cursor={{ fill: 'hsl(var(--muted))' }}
+                formatter={(value: number) => formatCurrency(value * rate, currency)}
+              />
+              <Bar dataKey="net" radius={[4, 4, 0, 0]} isAnimationActive={true} fill="#000" />
+            </BarChart>
+          </ChartContainer>
+        )}
       </CardContent>
       <CardFooter>
         <div className="flex w-full items-start gap-2 text-sm">
           <div className="grid gap-2">
             <div className="flex items-center gap-2 font-medium leading-none">
-              Net inflow trend <TrendingUp className="h-4 w-4" />
+              {data.length === 0 ? 'No trend to show yet' : 'Net inflow trend'}
+              <TrendingUp className="h-4 w-4" />
             </div>
             <div className="text-muted-foreground">{rangeLabel}</div>
           </div>
