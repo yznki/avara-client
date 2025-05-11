@@ -1,4 +1,4 @@
-import { mockUserAccounts } from '@/types/account';
+import { useUserContext } from '@/context/UserContext';
 import { ArrowUpRight, PiggyBank, Wallet } from 'lucide-react';
 import { AccountActivityRadarChart } from '@/components/Dashboard/AccountActivityRadarChart';
 import { AccountBalanceHistoryChart } from '@/components/Dashboard/AccountBalanceHistoryChart/AccountBalanceHistoryChart';
@@ -6,12 +6,25 @@ import { BalanceHistoryChart } from '@/components/Dashboard/BalanceHistoryChart'
 import { KPI } from '@/components/Dashboard/KPI';
 import { MonthlyNetFlowBarChart } from '@/components/Dashboard/MonthlyNetFlowBarChart';
 import SpendingBreakdownChart from '@/components/Dashboard/SpendingBreakdownChart';
-import { mockTransactions } from '@/components/TransactionsDataTable/mockTransactions';
 
 export default function Dashboard() {
-  const balance = 1250;
-  const spending = 1250;
-  const deposits = 1250;
+  const { accounts, transactions } = useUserContext();
+
+  const balance = accounts.find((account) => account.accountType === 'checking')?.balance || 0;
+
+  const spending = transactions.reduce((acc, tx) => {
+    if (tx.type != 'deposit') {
+      acc += tx.amount;
+    }
+    return acc;
+  }, 0);
+
+  const deposits = transactions.reduce((acc, tx) => {
+    if (tx.type === 'deposit') {
+      acc += tx.amount;
+    }
+    return acc;
+  }, 0);
 
   return (
     <div className="flex flex-col gap-4 py-4">
@@ -39,9 +52,9 @@ export default function Dashboard() {
         />
       </div>
       <div className="grid gap-4 sm:grid-cols-1 lg:grid-cols-3">
-        <AccountBalanceHistoryChart transactions={mockTransactions} accounts={mockUserAccounts} />
-        <MonthlyNetFlowBarChart transactions={mockTransactions} />
-        <AccountActivityRadarChart transactions={mockTransactions} accounts={mockUserAccounts} />
+        <AccountBalanceHistoryChart transactions={transactions} accounts={accounts} />
+        <MonthlyNetFlowBarChart transactions={transactions} />
+        <AccountActivityRadarChart transactions={transactions} accounts={accounts} />
       </div>
       <div className="grid gap-4 sm:grid-cols-1 lg:grid-cols-2">
         <BalanceHistoryChart />

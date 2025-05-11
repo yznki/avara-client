@@ -5,6 +5,21 @@
 /* Custom variant for dark mode utility classes */
 @custom-variant dark (&:is(.dark *));
 
+@layer utilities {
+  .animate-fade-in {
+    animation: fade-in 0.5s ease-out;
+  }
+
+  @keyframes fade-in {
+    0% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+}
+
 /* Theme token mapping */
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);

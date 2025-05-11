@@ -1,7 +1,15 @@
 import { useEffect } from 'react';
 import { useUserContext } from '@/context/UserContext';
 import { useAuth0 } from '@auth0/auth0-react';
+import { AnimatePresence, motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import FullPageSpinner from './Authentication/FullPageSpinner';
+
+const fadeVariants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1 },
+  exit: { opacity: 0 },
+};
 
 const AuthGuard = ({ children }: { children: React.ReactNode }) => {
   const { loginWithRedirect, isAuthenticated, isLoading: isAuthLoading } = useAuth0();
@@ -21,10 +29,36 @@ const AuthGuard = ({ children }: { children: React.ReactNode }) => {
     }
   }, [isAuthenticated, isAuthLoading, isBackendLoading, user, navigate]);
 
-  if (isAuthLoading || isBackendLoading || !isAuthenticated || (!user?._id && !isLoggedOut))
-    return null;
+  const showSpinner =
+    isAuthLoading || isBackendLoading || !isAuthenticated || (!user?._id && !isLoggedOut);
 
-  return <>{children}</>;
+  return (
+    <AnimatePresence mode="wait">
+      {showSpinner ? (
+        <motion.div
+          key="loader"
+          variants={fadeVariants}
+          initial="hidden"
+          animate="visible"
+          exit="exit"
+          transition={{ duration: 0.4 }}
+        >
+          <FullPageSpinner />
+        </motion.div>
+      ) : (
+        <motion.div
+          key="content"
+          variants={fadeVariants}
+          initial="hidden"
+          animate="visible"
+          exit="exit"
+          transition={{ duration: 0.4 }}
+        >
+          {children}
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
 };
 
 export default AuthGuard;

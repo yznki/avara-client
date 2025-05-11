@@ -27,7 +27,7 @@ function AccountSelect({ label, field, userAccounts }: AccountSelectProps) {
         <SelectContent>
           {userAccounts.map((account) => (
             <SelectItem key={account._id} value={account._id}>
-              {getAccountName(account.type)}
+              {getAccountName(account.accountType)}
             </SelectItem>
           ))}
         </SelectContent>

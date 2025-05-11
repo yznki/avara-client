@@ -1,9 +1,11 @@
 import { useMemo } from 'react';
+import { useCurrency } from '@/context/CurrencyContext';
 import type { AccountResponse, AccountType } from '@/types/account';
 import type { TransactionResponse } from '@/types/transaction';
 import { format } from 'date-fns';
 import { TrendingUp } from 'lucide-react';
 import { Area, AreaChart, CartesianGrid, Legend, XAxis, YAxis } from 'recharts';
+import { abbreviateNumber, getCurrencySymbol } from '@/lib/currencies';
 import {
   Card,
   CardContent,
@@ -22,6 +24,8 @@ interface Props {
 }
 
 export function AccountBalanceHistoryChart({ transactions, accounts }: Props) {
+  const { currency, rate } = useCurrency();
+
   const { chartData, rangeLabel } = useMemo(() => {
     if (transactions.length === 0) return { chartData: [], rangeLabel: 'No data' };
 
@@ -61,7 +65,7 @@ export function AccountBalanceHistoryChart({ transactions, accounts }: Props) {
             ? -1
             : 0;
 
-      entry[acc.type] += tx.amount * sign;
+      entry[acc.accountType] += tx.amount * sign;
     }
 
     return {
@@ -83,55 +87,63 @@ export function AccountBalanceHistoryChart({ transactions, accounts }: Props) {
         <CardDescription>Monthly inflows and outflows across all your accounts</CardDescription>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={chartConfig}>
-          <AreaChart data={chartData} margin={{ right: 12 }}>
-            <CartesianGrid vertical={false} />
-            <YAxis
-              tickLine={false}
-              axisLine={false}
-              tickMargin={8}
-              tickFormatter={(val) => {
-                if (Math.abs(val) >= 1_000_000) return `${(val / 1_000_000).toFixed(1)}M`;
-                if (Math.abs(val) >= 1_000) return `${(val / 1_000).toFixed(1)}k`;
-                return val.toFixed(0);
-              }}
-            />
-            <XAxis dataKey="month" tickLine={false} axisLine={false} tickMargin={8} />
-            <ChartTooltip cursor={false} content={<CustomTooltip chartConfig={chartConfig} />} />
-            <Legend
-              verticalAlign="top"
-              align="center"
-              iconType="circle"
-              wrapperStyle={{ fontSize: '0.75rem', paddingBottom: 16 }}
-              content={<CustomLegend />}
-            />
-            <defs>
-              {(['checking', 'savings', 'investment'] as AccountType[]).map((type) => (
-                <linearGradient key={type} id={`fill-${type}`} x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor={`var(--color-${type})`} stopOpacity={0.8} />
-                  <stop offset="95%" stopColor={`var(--color-${type})`} stopOpacity={0.1} />
-                </linearGradient>
-              ))}
-            </defs>
-            {(['checking', 'savings', 'investment'] as AccountType[]).map((type) => (
-              <Area
-                key={type}
-                type="monotone"
-                dataKey={type}
-                stroke={`var(--color-${type})`}
-                fill={`url(#fill-${type})`}
-                fillOpacity={0.4}
-                stackId="a"
+        {chartData.length === 0 ? (
+          <div className="flex flex-col items-center justify-center text-muted-foreground text-sm h-64 animate-fade-in">
+            <img src="/empty-states/empty-graph-4.svg" alt="No data" className="w-64 h-40 mb-4" />
+            <span>No account activity to display yet.</span>
+          </div>
+        ) : (
+          <ChartContainer config={chartConfig}>
+            <AreaChart data={chartData} margin={{ right: 12 }}>
+              <CartesianGrid vertical={false} />
+              <YAxis
+                tickLine={false}
+                axisLine={false}
+                tickMargin={8}
+                tickFormatter={(val) => {
+                  const shortened = abbreviateNumber(val * rate);
+                  const symbol = getCurrencySymbol(currency);
+                  return `${symbol}${shortened}`;
+                }}
               />
-            ))}
-          </AreaChart>
-        </ChartContainer>
+              <XAxis dataKey="month" tickLine={false} axisLine={false} tickMargin={8} />
+              <ChartTooltip cursor={false} content={<CustomTooltip chartConfig={chartConfig} />} />
+              <Legend
+                verticalAlign="top"
+                align="center"
+                iconType="circle"
+                wrapperStyle={{ fontSize: '0.75rem', paddingBottom: 16 }}
+                content={<CustomLegend />}
+              />
+              <defs>
+                {(['checking', 'savings', 'investment'] as AccountType[]).map((type) => (
+                  <linearGradient key={type} id={`fill-${type}`} x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor={`var(--color-${type})`} stopOpacity={0.8} />
+                    <stop offset="95%" stopColor={`var(--color-${type})`} stopOpacity={0.1} />
+                  </linearGradient>
+                ))}
+              </defs>
+              {(['checking', 'savings', 'investment'] as AccountType[]).map((type) => (
+                <Area
+                  key={type}
+                  type="monotone"
+                  dataKey={type}
+                  stroke={`var(--color-${type})`}
+                  fill={`url(#fill-${type})`}
+                  fillOpacity={0.4}
+                  stackId="a"
+                />
+              ))}
+            </AreaChart>
+          </ChartContainer>
+        )}
       </CardContent>
       <CardFooter>
         <div className="flex w-full items-start gap-2 text-sm">
           <div className="grid gap-2">
             <div className="flex items-center gap-2 font-medium leading-none">
-              You're growing! <TrendingUp className="h-4 w-4" />
+              {chartData.length === 0 ? 'No trend to show yet' : "You're growing!"}
+              <TrendingUp className="h-4 w-4" />
             </div>
             <div className="text-muted-foreground">{rangeLabel}</div>
           </div>

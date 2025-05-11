@@ -30,7 +30,7 @@ function Layout() {
         <header className="flex h-6 items-center gap-2">
           <SidebarTrigger />
           <Separator orientation="vertical" />
-          <p className="text-lg">{pageTitle}</p>
+          <p className="text-lg animate-fade-in">{pageTitle}</p>
         </header>
         <div className="flex-1">
           <Outlet />

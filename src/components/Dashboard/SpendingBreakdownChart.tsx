@@ -2,6 +2,7 @@
 
 import { useCurrency } from '@/context/CurrencyContext';
 import { useTransactionRange } from '@/context/TransactionRangeContext';
+import { useUserContext } from '@/context/UserContext';
 import { Wallet } from 'lucide-react';
 import { Legend, Pie, PieChart } from 'recharts';
 import { formatCurrency } from '@/lib/currencies';
@@ -15,7 +16,6 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { ChartContainer, ChartTooltip, type ChartConfig } from '@/components/ui/chart';
-import { mockTransactions } from '../TransactionsDataTable/mockTransactions';
 import CustomLegend from './AccountBalanceHistoryChart/CustomLegend';
 import { ChartRangeToggle } from './ChartRangeToggle';
 
@@ -65,9 +65,10 @@ const CustomPieTooltip = ({ active, payload }: { active?: boolean; payload?: any
 
 export default function SpendingBreakdownChart() {
   const { currency, rate } = useCurrency();
+  const { transactions } = useUserContext();
 
   const { range } = useTransactionRange();
-  const filtered = filterTransactionsByRange(mockTransactions, range);
+  const filtered = filterTransactionsByRange(transactions, range);
 
   const typeTotals = filtered.reduce(
     (acc, tx) => {
@@ -96,16 +97,25 @@ export default function SpendingBreakdownChart() {
         <ChartRangeToggle />
       </CardHeader>
       <CardContent className="flex-1 pb-0">
-        <ChartContainer config={chartConfig} className="mx-auto min-h-[200px]">
-          <PieChart>
-            <Pie
-              data={chartData}
-              dataKey="amount"
-              nameKey="type"
-              innerRadius={64}
-              labelLine={false}
-              label={({ payload, ...props }) => {
-                return (
+        {chartData.length === 0 ? (
+          <div className="flex flex-col items-center justify-center text-muted-foreground text-sm h-64 animate-fade-in">
+            <img
+              src="/empty-states/empty-graph-2.svg"
+              alt="No transactions"
+              className="w-64 h-40 mb-4"
+            />
+            <span>No transactions found for this range.</span>
+          </div>
+        ) : (
+          <ChartContainer config={chartConfig} className="mx-auto min-h-[200px]">
+            <PieChart>
+              <Pie
+                data={chartData}
+                dataKey="amount"
+                nameKey="type"
+                innerRadius={64}
+                labelLine={false}
+                label={({ payload, ...props }) => (
                   <text
                     cx={props.cx}
                     cy={props.cy}
@@ -118,19 +128,19 @@ export default function SpendingBreakdownChart() {
                   >
                     {payload.formattedLabel}
                   </text>
-                );
-              }}
-            />
-            <Legend
-              verticalAlign="top"
-              align="center"
-              iconType="circle"
-              wrapperStyle={{ fontSize: '0.75rem', paddingBottom: 16 }}
-              content={<CustomLegend />}
-            />
-            <ChartTooltip content={<CustomPieTooltip />} />
-          </PieChart>
-        </ChartContainer>
+                )}
+              />
+              <Legend
+                verticalAlign="top"
+                align="center"
+                iconType="circle"
+                wrapperStyle={{ fontSize: '0.75rem', paddingBottom: 16 }}
+                content={<CustomLegend />}
+              />
+              <ChartTooltip content={<CustomPieTooltip />} />
+            </PieChart>
+          </ChartContainer>
+        )}
       </CardContent>
       <CardFooter className="flex-col items-start gap-2 text-sm">
         <div className="flex items-center gap-2 font-medium leading-none">
