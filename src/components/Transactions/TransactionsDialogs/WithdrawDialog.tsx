@@ -1,10 +1,14 @@
 'use client';
 
+import { useState } from 'react';
 import { useCurrency } from '@/context/CurrencyContext';
-import { mockUserAccounts } from '@/types/account';
+import { useUserContext } from '@/context/UserContext';
+import { useAuth0 } from '@auth0/auth0-react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 import { z } from 'zod';
+import { api } from '@/lib/api';
 import { formatCurrency } from '@/lib/currencies';
 import AccountSelect from '@/components/Forms/AccountSelect';
 import { Button } from '@/components/ui/button';
@@ -33,6 +37,10 @@ interface WithdrawDialogProps {
 
 function WithdrawDialog({ isVisible, setIsVisible }: WithdrawDialogProps) {
   const { currency, rate } = useCurrency();
+  const { accounts, refetchAccountsAndTransactions } = useUserContext();
+  const { getAccessTokenSilently } = useAuth0();
+
+  const [isLoading, setIsLoading] = useState(false);
 
   const withdrawSchema = z
     .object({
@@ -41,17 +49,20 @@ function WithdrawDialog({ isVisible, setIsVisible }: WithdrawDialogProps) {
       note: z.string().optional(),
     })
     .superRefine((data, ctx) => {
-      const account = mockUserAccounts.find((a) => a._id === data.account);
+      const account = accounts.find((a) => a._id === data.account);
       if (!account) {
         ctx.addIssue({
           code: 'custom',
           message: 'Selected account not found.',
           path: ['account'],
         });
-      } else if (data.amount > account.balance) {
+      } else if (data.amount > account.balance * rate) {
         ctx.addIssue({
           code: 'custom',
-          message: `You can't withdraw more than your balance of ${formatCurrency(account.balance * rate, currency)}.`,
+          message: `You can't withdraw more than your balance of ${formatCurrency(
+            account.balance * rate,
+            currency,
+          )}.`,
           path: ['amount'],
         });
       }
@@ -62,9 +73,29 @@ function WithdrawDialog({ isVisible, setIsVisible }: WithdrawDialogProps) {
     defaultValues: { amount: 0 },
   });
 
-  function onSubmit(values: z.infer<typeof withdrawSchema>) {
-    values.amount = values.amount / rate;
-    console.log('Withdraw request:', values);
+  async function onSubmit(values: z.infer<typeof withdrawSchema>) {
+    setIsLoading(true);
+    const payload = {
+      accountId: values.account,
+      amount: values.amount / rate,
+      note: values.note,
+    };
+
+    const token = await getAccessTokenSilently();
+
+    try {
+      await api.post('/transactions/withdraw', payload, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      toast.success('Withdrawal submitted');
+      await refetchAccountsAndTransactions();
+      form.reset();
+      setIsVisible(false);
+    } catch (err) {
+      toast.error('Something went wrong during withdrawal');
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   function closeDialog() {
@@ -76,8 +107,7 @@ function WithdrawDialog({ isVisible, setIsVisible }: WithdrawDialogProps) {
     <Dialog
       open={isVisible}
       onOpenChange={(open) => {
-        form.reset();
-        setIsVisible(open);
+        if (!open) closeDialog();
       }}
     >
       <DialogContent onInteractOutside={closeDialog}>
@@ -99,7 +129,12 @@ function WithdrawDialog({ isVisible, setIsVisible }: WithdrawDialogProps) {
                   <FormControl>
                     <div className="flex items-center gap-2">
                       <span>{currency}</span>
-                      <Input {...field} placeholder="Enter an amount" type="number" />
+                      <Input
+                        {...field}
+                        placeholder="Enter an amount"
+                        type="number"
+                        disabled={isLoading}
+                      />
                     </div>
                   </FormControl>
                   <FormMessage />
@@ -110,7 +145,12 @@ function WithdrawDialog({ isVisible, setIsVisible }: WithdrawDialogProps) {
               control={form.control}
               name="account"
               render={({ field }) => (
-                <AccountSelect label="Account" userAccounts={mockUserAccounts} field={field} />
+                <AccountSelect
+                  label="Account"
+                  userAccounts={accounts}
+                  field={field}
+                  disabled={isLoading}
+                />
               )}
             />
             <FormField
@@ -124,6 +164,7 @@ function WithdrawDialog({ isVisible, setIsVisible }: WithdrawDialogProps) {
                       placeholder="What's this withdrawal for?"
                       className="resize-none"
                       {...field}
+                      disabled={isLoading}
                     />
                   </FormControl>
                   <FormMessage />
@@ -131,10 +172,12 @@ function WithdrawDialog({ isVisible, setIsVisible }: WithdrawDialogProps) {
               )}
             />
             <div className="w-full grid grid-cols-2 gap-2">
-              <Button variant="ghost" type="reset" onClick={closeDialog}>
+              <Button variant="ghost" type="reset" onClick={closeDialog} disabled={isLoading}>
                 Cancel
               </Button>
-              <Button type="submit">Withdraw</Button>
+              <Button type="submit" disabled={isLoading}>
+                Withdraw
+              </Button>
             </div>
           </form>
         </Form>
