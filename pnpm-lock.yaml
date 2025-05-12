@@ -106,6 +106,12 @@ importers:
       tailwind-merge:
         specifier: ^3.2.0
         version: 3.2.0
+      typescript:
+        specifier: 5.8.3
+        version: 5.8.3
+      vite:
+        specifier: 6.3.5
+        version: 6.3.5(@types/node@22.15.14)(jiti@2.4.2)(lightningcss@1.29.2)(yaml@2.7.1)
       zod:
         specifier: ^3.24.4
         version: 3.24.4
@@ -170,15 +176,9 @@ importers:
       tw-animate-css:
         specifier: ^1.2.9
         version: 1.2.9
-      typescript:
-        specifier: ~5.8.3
-        version: 5.8.3
       typescript-eslint:
         specifier: ^8.30.1
         version: 8.32.0(eslint@9.26.0(jiti@2.4.2))(typescript@5.8.3)
-      vite:
-        specifier: ^6.3.5
-        version: 6.3.5(@types/node@22.15.14)(jiti@2.4.2)(lightningcss@1.29.2)(yaml@2.7.1)
 
 packages:
   '@alloc/quick-lru@5.2.0':
