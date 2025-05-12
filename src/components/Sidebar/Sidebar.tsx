@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { useState } from 'react';
+import { useUserContext } from '@/context/UserContext';
 import DepositDialog from '@/components/Transactions/TransactionsDialogs/DepositDialog';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader } from '@/components/ui/sidebar';
 import TransferDialog from '../Transactions/TransactionsDialogs/TransferDialog/TransferDialog';
@@ -14,6 +15,8 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
   const [isDepositDialogOpen, setIsDepositDialogOpen] = useState(false);
   const [isWithdrawDialogOpen, setIsWithdrawDialogOpen] = useState(false);
   const [isTransferDialogOpen, setIsTransferDialogOpen] = useState(false);
+
+  const { user } = useUserContext();
 
   return (
     <>
@@ -31,12 +34,11 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
           <NavSecondary />
         </SidebarContent>
         <SidebarFooter>
-          {/* TODO: When adding api, change this to a user. */}
           <NavUser
             user={{
-              name: 'John Doe',
-              email: 'v4Kx3@example.com',
-              avatar: 'https://github.com/shadcn.png',
+              name: user.name,
+              email: user.email,
+              avatar: user.profilePicture,
             }}
           />
         </SidebarFooter>

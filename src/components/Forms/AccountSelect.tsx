@@ -12,13 +12,14 @@ interface AccountSelectProps {
   label: string;
   field: any;
   userAccounts: AccountResponse[];
+  disabled?: boolean;
 }
 
-function AccountSelect({ label, field, userAccounts }: AccountSelectProps) {
+function AccountSelect({ label, field, userAccounts, disabled }: AccountSelectProps) {
   return (
     <FormItem>
       <FormLabel>{label}</FormLabel>
-      <Select onValueChange={field.onChange} defaultValue={field.value}>
+      <Select onValueChange={field.onChange} defaultValue={field.value} disabled={disabled}>
         <FormControl>
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Select an account" />
@@ -27,7 +28,7 @@ function AccountSelect({ label, field, userAccounts }: AccountSelectProps) {
         <SelectContent>
           {userAccounts.map((account) => (
             <SelectItem key={account._id} value={account._id}>
-              {getAccountName(account.type)}
+              {getAccountName(account.accountType)}
             </SelectItem>
           ))}
         </SelectContent>

@@ -1,10 +1,14 @@
 'use client';
 
+import { useState } from 'react';
 import { useCurrency } from '@/context/CurrencyContext';
-import { mockUserAccounts } from '@/types/account';
+import { useUserContext } from '@/context/UserContext';
+import { useAuth0 } from '@auth0/auth0-react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 import { z } from 'zod';
+import { api } from '@/lib/api';
 import AccountSelect from '@/components/Forms/AccountSelect';
 import { Button } from '@/components/ui/button';
 import {
@@ -41,19 +45,45 @@ const depositSchema = z.object({
 
 function DepositDialog({ isVisible, setIsVisible }: DepositDialogProps) {
   const { currency, rate } = useCurrency();
+  const { getAccessTokenSilently } = useAuth0();
+  const { accounts, refetchAccountsAndTransactions } = useUserContext();
+
+  const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<z.infer<typeof depositSchema>>({
     resolver: zodResolver(depositSchema),
     defaultValues: { amount: 0 },
   });
 
-  function onSubmit(values: z.infer<typeof depositSchema>) {
-    // Change to USD for API call
-    values.amount = values.amount / rate;
-    console.log(values.amount);
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
+  async function onSubmit(values: z.infer<typeof depositSchema>) {
+    if (isLoading) return;
+
+    setIsLoading(true);
+
+    const payload = {
+      accountId: values.account,
+      amount: values.amount / rate,
+      note: values.note,
+    };
+
+    try {
+      const token = await getAccessTokenSilently();
+      const headers = { Authorization: `Bearer ${token}` };
+
+      await api.post('/transactions/deposit', payload, { headers });
+
+      toast.success('Deposit successful');
+      await refetchAccountsAndTransactions();
+      closeDialog();
+    } catch (err: any) {
+      const code = err.response?.status;
+      if (code === 400) toast.error('Invalid input');
+      else if (code === 403) toast.error('Unauthorized or account not found');
+      else if (code === 500) toast.error('Deposit failed');
+      else toast.error('Unexpected error');
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   function closeDialog() {
@@ -101,7 +131,7 @@ function DepositDialog({ isVisible, setIsVisible }: DepositDialogProps) {
               control={form.control}
               name="account"
               render={({ field }) => (
-                <AccountSelect label="Account" userAccounts={mockUserAccounts} field={field} />
+                <AccountSelect label="Account" userAccounts={accounts} field={field} />
               )}
             />
             <FormField
@@ -125,7 +155,9 @@ function DepositDialog({ isVisible, setIsVisible }: DepositDialogProps) {
               <Button variant="ghost" type="reset" onClick={closeDialog}>
                 Cancel
               </Button>
-              <Button type="submit">Submit</Button>
+              <Button type="submit" disabled={isLoading}>
+                {isLoading ? 'Submitting...' : 'Submit'}
+              </Button>
             </div>
           </form>
         </Form>

@@ -3,6 +3,7 @@
 import { useMemo } from 'react';
 import { useCurrency } from '@/context/CurrencyContext';
 import { useTransactionRange } from '@/context/TransactionRangeContext';
+import { useUserContext } from '@/context/UserContext';
 import { format } from 'date-fns';
 import { Activity } from 'lucide-react';
 import { CartesianGrid, Line, LineChart, XAxis, YAxis } from 'recharts';
@@ -22,7 +23,6 @@ import {
   ChartTooltipContent,
   type ChartConfig,
 } from '@/components/ui/chart';
-import { mockTransactions } from '../TransactionsDataTable/mockTransactions';
 import { ChartRangeToggle } from './ChartRangeToggle';
 
 const chartConfig = {
@@ -34,8 +34,10 @@ const chartConfig = {
 
 export function BalanceHistoryChart() {
   const { currency, rate } = useCurrency();
+  const { transactions } = useUserContext();
+
   const { range } = useTransactionRange();
-  const filtered = filterTransactionsByRange(mockTransactions, range);
+  const filtered = filterTransactionsByRange(transactions, range);
 
   const monthlyData = filtered.reduce(
     (acc, tx) => {
@@ -78,53 +80,60 @@ export function BalanceHistoryChart() {
         <ChartRangeToggle />
       </CardHeader>
       <CardContent>
-        <ChartContainer config={chartConfig}>
-          <LineChart accessibilityLayer data={chartData} margin={{ left: 12, right: 12 }}>
-            <CartesianGrid vertical={false} />
-            <XAxis
-              dataKey="month"
-              tickLine={false}
-              axisLine={false}
-              tickMargin={8}
-              tickFormatter={(value) => value.slice(0, 3)}
+        {chartData.length === 0 ? (
+          <div className="flex flex-col items-center justify-center text-muted-foreground text-sm h-64 animate-fade-in">
+            <img
+              src="/empty-states/empty-graph-1.svg"
+              alt="No transactions"
+              className="w-64 h-40 mb-4"
             />
-            <YAxis
-              domain={[min, max]}
-              ticks={ticks}
-              tickLine={false}
-              axisLine={false}
-              tickMargin={10}
-              tick={{ fontSize: 12 }}
-              tickFormatter={(val) =>
-                new Intl.NumberFormat('en-US', {
-                  style: 'currency',
-                  currency,
-                  notation: 'compact',
-                }).format(val)
-              }
-            />
-            <ChartTooltip
-              cursor={false}
-              content={
-                <ChartTooltipContent
-                  formatter={(val) => formatCurrency(Number(val) * rate, currency)}
-                />
-              }
-            />
-            <Line
-              dataKey="balance"
-              type="natural"
-              stroke="var(--color-balance)"
-              strokeWidth={2}
-              dot={{
-                fill: 'var(--color-balance)',
-              }}
-              activeDot={{
-                r: 5,
-              }}
-            />
-          </LineChart>
-        </ChartContainer>
+            <span>No transactions found for this range.</span>
+          </div>
+        ) : (
+          <ChartContainer config={chartConfig}>
+            <LineChart accessibilityLayer data={chartData} margin={{ left: 12, right: 12 }}>
+              <CartesianGrid vertical={false} />
+              <XAxis
+                dataKey="month"
+                tickLine={false}
+                axisLine={false}
+                tickMargin={8}
+                tickFormatter={(value) => value.slice(0, 3)}
+              />
+              <YAxis
+                domain={[min, max]}
+                ticks={ticks}
+                tickLine={false}
+                axisLine={false}
+                tickMargin={10}
+                tick={{ fontSize: 12 }}
+                tickFormatter={(val) =>
+                  new Intl.NumberFormat('en-US', {
+                    style: 'currency',
+                    currency,
+                    notation: 'compact',
+                  }).format(val)
+                }
+              />
+              <ChartTooltip
+                cursor={false}
+                content={
+                  <ChartTooltipContent
+                    formatter={(val) => formatCurrency(Number(val) * rate, currency)}
+                  />
+                }
+              />
+              <Line
+                dataKey="balance"
+                type="natural"
+                stroke="var(--color-balance)"
+                strokeWidth={2}
+                dot={{ fill: 'var(--color-balance)' }}
+                activeDot={{ r: 5 }}
+              />
+            </LineChart>
+          </ChartContainer>
+        )}
       </CardContent>
       <CardFooter className="flex-col items-start gap-2 text-sm">
         <div className="flex gap-2 font-medium leading-none">

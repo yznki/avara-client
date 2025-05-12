@@ -65,15 +65,14 @@ function TransactionsDataTable({
     );
   }
 
-  function formatAccount(
-    accountId: string | null,
-    accounts: TransactionsDataTableProps['accounts'],
-  ) {
+  function formatAccount(accountId: string | null, accounts: AccountResponse[]) {
     if (!accountId) return null;
     const acc = accounts.find((a) => a._id === accountId);
-    if (!acc) return 'Unknown';
-    const suffix = accountId.slice(-4);
-    return `${capitalize(acc.type)} - ****${suffix}`;
+    if (acc) {
+      const suffix = accountId.slice(-4);
+      return `${capitalize(acc.accountType)} - ****${suffix}`;
+    }
+    return 'External Account';
   }
 
   function capitalize(text: string) {

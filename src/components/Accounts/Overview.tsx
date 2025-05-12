@@ -1,4 +1,5 @@
 import { useCurrency } from '@/context/CurrencyContext';
+import { useUserContext } from '@/context/UserContext';
 import { getAccountName, type AccountResponse } from '@/types/account';
 import type { TransactionResponse } from '@/types/transaction';
 import { ExternalLink, PiggyBank, Trash2, Wallet } from 'lucide-react';
@@ -21,26 +22,29 @@ interface OverviewProps {
   account: AccountResponse;
   userTransactions: TransactionResponse[];
   onDelete?: (account: AccountResponse) => void;
+  isDeleting?: boolean;
 }
 
-function Overview({ account, userTransactions, onDelete }: OverviewProps) {
+function Overview({ account, userTransactions, onDelete, isDeleting }: OverviewProps) {
+  const { accounts } = useUserContext();
+
   const { currency, rate } = useCurrency();
 
-  const canDelete = account.type !== 'checking';
+  const canDelete = account.accountType !== 'checking';
 
-  const filteredTransactions = userTransactions.filter((tx) => {
-    tx.fromAccountId === account._id;
-  });
+  const filteredTransactions = userTransactions.filter(
+    (tx) => tx.fromAccountId === account._id || tx.toAccountId === account._id,
+  );
 
   const depositsThisMonth = userTransactions.reduce((acc, tx) => {
-    if (tx.type === 'deposit') {
+    if (tx.type === 'deposit' && tx.toAccountId === account._id) {
       acc += tx.amount;
     }
     return acc;
   }, 0);
 
   const spendingThisMonth = userTransactions.reduce((acc, tx) => {
-    if (tx.type === 'withdrawal') {
+    if (tx.type === 'withdrawal' && tx.fromAccountId === account._id) {
       acc += tx.amount;
     }
     return acc;
@@ -49,27 +53,35 @@ function Overview({ account, userTransactions, onDelete }: OverviewProps) {
   return (
     <div className="space-y-4">
       <div className="flex gap-2 items-center">
-        <h2 className="text-2xl font-bold">{getAccountName(account.type)}</h2>
+        <h2 className="text-2xl font-bold">{getAccountName(account.accountType)}</h2>
         {canDelete && onDelete && (
           <AlertDialog>
-            <AlertDialogTrigger className="bg-red-500 hover:bg-red-600 hover:cursor-pointer p-1 text-white rounded-sm">
-              <Trash2 size={16} />
+            <AlertDialogTrigger
+              className="bg-red-500 hover:bg-red-600 hover:cursor-pointer p-1 text-white rounded-sm disabled:opacity-50"
+              disabled={isDeleting}
+            >
+              {isDeleting ? (
+                <span className="text-xs px-1">Deleting...</span>
+              ) : (
+                <Trash2 size={16} />
+              )}
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
                 <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                 <AlertDialogDescription>
-                  This action cannot be undone. This will permanently delete your account and move
-                  the balance to the checking account.
+                  This will permanently delete your account and transfer the balance to your
+                  checking account.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
                 <AlertDialogAction
                   onClick={() => onDelete(account)}
                   className="bg-red-500 hover:bg-red-600 hover:cursor-pointer"
+                  disabled={isDeleting}
                 >
-                  Continue
+                  {isDeleting ? 'Deleting...' : 'Continue'}
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
@@ -95,9 +107,9 @@ function Overview({ account, userTransactions, onDelete }: OverviewProps) {
         />
       </div>
 
-      <div className="hidden md:grid gap-2">
+      <div className="grid gap-2">
         <span className="text-lg font-semibold">Recent Transcations</span>
-        <TransactionsDataTable transactions={filteredTransactions} accounts={[account]} />
+        <TransactionsDataTable transactions={filteredTransactions} accounts={accounts} />
       </div>
     </div>
   );

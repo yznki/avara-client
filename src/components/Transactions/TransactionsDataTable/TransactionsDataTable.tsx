@@ -15,7 +15,6 @@ interface TransactionsDataTableProps {
 
 function TransactionsDataTable({ transactions, accounts }: TransactionsDataTableProps) {
   const { rate, currency } = useCurrency();
-
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState('all');
 
@@ -68,7 +67,7 @@ function TransactionsDataTable({ transactions, accounts }: TransactionsDataTable
     const acc = accounts.find((a) => a._id === accountId);
     if (!acc) return 'Unknown';
     const suffix = accountId.slice(-4);
-    return `${capitalize(acc.type)} - ****${suffix}`;
+    return `${capitalize(acc.accountType)} - ****${suffix}`;
   }
 
   function capitalize(text: string) {
