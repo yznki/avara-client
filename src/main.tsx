@@ -4,6 +4,7 @@ import { RouterProvider } from 'react-router-dom';
 import { router } from './router';
 import './index.css';
 import { Auth0Provider } from '@auth0/auth0-react';
+import { Toaster } from 'sonner';
 import { CurrencyProvider } from './context/CurrencyContext';
 import { UserProvider } from './context/UserContext';
 
@@ -32,6 +33,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       <UserProvider>
         <CurrencyProvider>
           <RouterProvider router={router} />
+          <Toaster />
         </CurrencyProvider>
       </UserProvider>
     </Auth0Provider>

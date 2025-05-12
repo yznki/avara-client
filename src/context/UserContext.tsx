@@ -11,65 +11,71 @@ interface UserContextType {
   transactions: TransactionResponse[];
   isAuthLoading: boolean;
   isBackendLoading: boolean;
-  reset: () => void;
   isLoggedOut: boolean;
+  reset: () => void;
+  refetchAccountsAndTransactions: () => Promise<void>;
 }
 
 const UserContext = createContext<UserContextType | null>(null);
 
 export const useUserContext = () => {
-  const ctx = useContext(UserContext);
-  if (!ctx) throw new Error('useUserContext must be used within UserProvider');
-  return ctx;
+  const context = useContext(UserContext);
+  if (!context) throw new Error('useUserContext must be used within UserProvider');
+  return context;
 };
 
 export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated, getAccessTokenSilently, isLoading } = useAuth0();
+
   const [user, setUser] = useState<UserResponse>({} as UserResponse);
-  const [accounts, setAccounts] = useState([]);
-  const [transactions, setTransactions] = useState([]);
+  const [accounts, setAccounts] = useState<AccountResponse[]>([]);
+  const [transactions, setTransactions] = useState<TransactionResponse[]>([]);
   const [isLoggedOut, setIsLoggedOut] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [isBackendLoading, setIsBackendLoading] = useState(true);
 
   useEffect(() => {
-    fetchUserData();
+    if (!isLoading) {
+      fetchUserData();
+    }
   }, [isAuthenticated, isLoading]);
 
-  const fetchUserData = async () => {
-    if (isLoading) return;
+  const fetchUserInfo = async (headers: Record<string, string>) => {
+    const response = await api.get('/user/me', { headers });
+    setUser(response.data);
+  };
 
+  const fetchAccountsAndTransactions = async (headers: Record<string, string>) => {
+    const [accountsResponse, transactionsResponse] = await Promise.all([
+      api.get('/accounts', { headers }),
+      api.get('/transactions', { headers }),
+    ]);
+    setAccounts(accountsResponse.data);
+    setTransactions(transactionsResponse.data);
+  };
+
+  const fetchUserData = async () => {
     if (!isAuthenticated) {
-      setLoading(false);
+      setIsBackendLoading(false);
       return;
     }
 
-    const MAX_RETRIES = 5;
+    const maximumRetries = 5;
 
-    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+    for (let attempt = 1; attempt <= maximumRetries; attempt++) {
       try {
         const token = await getAccessTokenSilently();
         const headers = { Authorization: `Bearer ${token}` };
 
-        const [userRes, accRes, txRes] = await Promise.all([
-          api.get('/api/user/me', { headers }),
-          api.get('/api/accounts', { headers }),
-          api.get('/api/transactions', { headers }),
-        ]);
+        await Promise.all([fetchUserInfo(headers), fetchAccountsAndTransactions(headers)]);
 
-        setUser(userRes.data);
-        setAccounts(accRes.data);
-        setTransactions(txRes.data);
-        setLoading(false);
+        setIsBackendLoading(false);
         setIsLoggedOut(false);
         return;
-      } catch (err: any) {
-        console.error(`Fetch attempt ${attempt} failed.`, err);
+      } catch (error: any) {
+        const isFinalAttempt = attempt === maximumRetries;
+        const isUnauthorized = [401, 403].includes(error?.response?.status);
 
-        const isFinal = attempt === MAX_RETRIES;
-        const shouldReset = isFinal || [401, 403].includes(err?.response?.status);
-
-        if (shouldReset) {
-          console.warn('Giving up. Resetting state.');
+        if (isFinalAttempt || isUnauthorized) {
           reset();
           return;
         }
@@ -82,7 +88,13 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     setAccounts([]);
     setTransactions([]);
     setIsLoggedOut(true);
-    setLoading(false);
+    setIsBackendLoading(false);
+  };
+
+  const refetchAccountsAndTransactions = async () => {
+    const token = await getAccessTokenSilently();
+    const headers = { Authorization: `Bearer ${token}` };
+    await fetchAccountsAndTransactions(headers);
   };
 
   return (
@@ -91,10 +103,11 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         user,
         accounts,
         transactions,
-        isBackendLoading: loading,
         isAuthLoading: isLoading,
-        reset,
+        isBackendLoading,
         isLoggedOut,
+        reset,
+        refetchAccountsAndTransactions,
       }}
     >
       {children}
