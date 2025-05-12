@@ -1,5 +1,6 @@
 'use client';
 
+import { useUserContext } from '@/context/UserContext';
 import {
   Dialog,
   DialogContent,
@@ -17,6 +18,13 @@ interface TransferDialogProps {
 }
 
 export default function TransferDialog({ isVisible, setIsVisible }: TransferDialogProps) {
+  const { refetchAccountsAndTransactions } = useUserContext();
+
+  const onSuccess = () => {
+    refetchAccountsAndTransactions();
+    setIsVisible(false);
+  };
+
   return (
     <Dialog open={isVisible} onOpenChange={setIsVisible}>
       <DialogContent className="sm:max-w-[600px]">
@@ -35,11 +43,11 @@ export default function TransferDialog({ isVisible, setIsVisible }: TransferDial
           </TabsList>
 
           <TabsContent value="internal">
-            <InternalTransferForm onSuccess={() => setIsVisible(false)} />
+            <InternalTransferForm onSuccess={onSuccess} />
           </TabsContent>
 
           <TabsContent value="external">
-            <ExternalTransferForm onSuccess={() => setIsVisible(false)} />
+            <ExternalTransferForm onSuccess={onSuccess} />
           </TabsContent>
         </Tabs>
       </DialogContent>

@@ -15,7 +15,6 @@ interface TransactionsDataTableProps {
 
 function TransactionsDataTable({ transactions, accounts }: TransactionsDataTableProps) {
   const { rate, currency } = useCurrency();
-
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState('all');
 
