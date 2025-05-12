@@ -1,11 +1,15 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useEffect, useState } from 'react';
 import { useCurrency } from '@/context/CurrencyContext';
-import { mockUserAccounts } from '@/types/account';
+import { useUserContext } from '@/context/UserContext';
+import type { UserResponse } from '@/types/user';
+import { useAuth0 } from '@auth0/auth0-react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 import { z } from 'zod';
+import { api } from '@/lib/api';
 import AccountSelect from '@/components/Forms/AccountSelect';
 import { Button } from '@/components/ui/button';
 import {
@@ -26,60 +30,93 @@ import {
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 
-const mockUsers = [
-  { name: 'Ali Hassan', email: 'ali@example.com' },
-  { name: 'Fatima Zayed', email: 'fatima@example.com' },
-  { name: 'Yazan Kiswani', email: 'yzn@gmail.com' },
-];
-
 interface ExternalTransferFormProps {
   onSuccess: () => void;
 }
 
-const externalTransferSchema = z
-  .object({
-    to: z.string({ required_error: 'Please select a user' }).email(),
-    from: z.string({ required_error: 'Please select a source account' }),
-    amount: z.coerce.number({ required_error: 'Please enter an amount' }).positive(),
-    note: z.string().optional(),
-  })
-  .superRefine((data, ctx) => {
-    const fromAccount = mockUserAccounts.find((a) => a._id === data.from);
-    if (!fromAccount) {
-      ctx.addIssue({
-        code: 'custom',
-        path: ['from'],
-        message: 'Source account not found.',
-      });
-    } else if (data.amount > fromAccount.balance) {
-      ctx.addIssue({
-        code: 'custom',
-        path: ['amount'],
-        message: `Insufficient balance. Max: ${fromAccount.balance}`,
-      });
-    }
-  });
-
 export default function ExternalTransferForm({ onSuccess }: ExternalTransferFormProps) {
+  const { accounts, user } = useUserContext();
+  const [isLoading, setIsLoading] = useState(false);
+
+  const externalTransferSchema = z
+    .object({
+      to: z
+        .string({ required_error: 'Please select a user' })
+        .refine((to) => to !== user._id, { message: 'You cannot transfer to yourself' }),
+      from: z.string({ required_error: 'Please select a source account' }),
+      amount: z.coerce.number({ required_error: 'Please enter an amount' }).positive(),
+      note: z.string().optional(),
+    })
+    .superRefine((data, ctx) => {
+      const fromAccount = accounts.find((a) => a._id === data.from);
+      if (!fromAccount) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['from'],
+          message: 'Source account not found.',
+        });
+      } else if (data.amount > fromAccount.balance * rate) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['amount'],
+          message: `Insufficient balance. Max: ${(fromAccount.balance * rate).toFixed(2)} ${currency}`,
+        });
+      }
+    });
+
   const { currency, rate } = useCurrency();
+  const { getAccessTokenSilently } = useAuth0();
+
+  const [users, setUsers] = useState<UserResponse[]>([]);
 
   const form = useForm<z.infer<typeof externalTransferSchema>>({
     resolver: zodResolver(externalTransferSchema),
-    defaultValues: {
-      amount: 0,
-    },
+    defaultValues: { amount: 0 },
   });
 
-  const userOptions = useMemo(() => mockUsers, []);
+  useEffect(() => {
+    (async () => {
+      try {
+        const token = await getAccessTokenSilently();
+        const res = await api.get('/user/all', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setUsers(res.data.filter((existingUser: UserResponse) => existingUser._id !== user._id));
+      } catch (err) {
+        toast.error('Failed to load users');
+        console.error(err);
+      }
+    })();
+  }, []);
 
-  function onSubmit(values: z.infer<typeof externalTransferSchema>) {
+  async function onSubmit(values: z.infer<typeof externalTransferSchema>) {
+    setIsLoading(true);
+
     const payload = {
-      ...values,
+      fromId: values.from,
+      toUserId: values.to,
       amount: values.amount / rate,
+      note: values.note,
     };
 
-    console.log('External Transfer:', payload);
-    onSuccess();
+    try {
+      const token = await getAccessTokenSilently();
+      await api.post('/transactions/external-transfer', payload, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      toast.success('Transfer sent successfully');
+      onSuccess();
+      form.reset();
+    } catch (err: any) {
+      const code = err?.response?.status;
+      if (code === 400) toast.error('Invalid input');
+      else if (code === 403) toast.error('Unauthorized or account not found');
+      else if (code === 500) toast.error('Transfer failed');
+      else toast.error('Unexpected error');
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   function onCancel() {
@@ -95,7 +132,7 @@ export default function ExternalTransferForm({ onSuccess }: ExternalTransferForm
             control={form.control}
             name="from"
             render={({ field }) => (
-              <AccountSelect label="From" userAccounts={mockUserAccounts} field={field} />
+              <AccountSelect label="From" userAccounts={accounts} field={field} />
             )}
           />
           <FormField
@@ -110,8 +147,8 @@ export default function ExternalTransferForm({ onSuccess }: ExternalTransferForm
                       <SelectValue placeholder="Select a user" />
                     </SelectTrigger>
                     <SelectContent>
-                      {userOptions.map((user) => (
-                        <SelectItem key={user.email} value={user.email}>
+                      {users.map((user) => (
+                        <SelectItem key={user._id} value={user._id}>
                           {user.name}
                         </SelectItem>
                       ))}
@@ -157,10 +194,12 @@ export default function ExternalTransferForm({ onSuccess }: ExternalTransferForm
           )}
         />
         <div className="w-full grid grid-cols-2 gap-2">
-          <Button variant="ghost" type="reset" onClick={onCancel}>
+          <Button variant="ghost" type="reset" onClick={onCancel} disabled={isLoading}>
             Cancel
           </Button>
-          <Button type="submit">Transfer</Button>
+          <Button type="submit" disabled={isLoading}>
+            Transfer
+          </Button>
         </div>
       </form>
     </Form>
