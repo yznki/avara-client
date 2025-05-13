@@ -14,6 +14,7 @@ interface UserContextType {
   isLoggedOut: boolean;
   reset: () => void;
   refetchAccountsAndTransactions: () => Promise<void>;
+  refetchUser: () => Promise<void>;
 }
 
 const UserContext = createContext<UserContextType | null>(null);
@@ -83,6 +84,12 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  const refetchUser = async () => {
+    const token = await getAccessTokenSilently();
+    const headers = { Authorization: `Bearer ${token}` };
+    await fetchUserInfo(headers); // already defined
+  };
+
   const reset = () => {
     setUser({} as UserResponse);
     setAccounts([]);
@@ -108,6 +115,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         isLoggedOut,
         reset,
         refetchAccountsAndTransactions,
+        refetchUser,
       }}
     >
       {children}

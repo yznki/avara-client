@@ -116,14 +116,14 @@
 
 /* Dark mode theme */
 .dark {
-  --background: #111111;
+  --background: #121212;
   --foreground: #ffffff;
-  --card: #1e1e1e;
+  --card: #202020;
   --card-foreground: #ffffff;
   --popover: #1e1e1e;
   --popover-foreground: #ffffff;
 
-  --primary: #d4e3ff;
+  --primary: #4f8dff;
   --primary-foreground: #0b5af5;
 
   --secondary: #9eaff2;
@@ -133,7 +133,7 @@
   --muted-foreground: #a3a3a3;
 
   --accent: #356df7;
-  --accent-foreground: #0c2985;
+  --accent-foreground: #2344af;
 
   --destructive: #ff6b6b;
   --border: #333333;

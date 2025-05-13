@@ -14,8 +14,8 @@ import { useSidebar } from '@/components/ui/sidebar';
 
 export function CurrencySelect() {
   const { currency, setCurrency, rates } = useCurrency();
-  const { state } = useSidebar();
-  const isCollapsed = state === 'collapsed';
+  const { state, isMobile } = useSidebar();
+  const isCollapsed = state === 'collapsed' && !isMobile;
 
   return (
     <Select value={currency} onValueChange={setCurrency}>

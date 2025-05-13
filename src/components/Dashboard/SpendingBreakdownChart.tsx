@@ -54,7 +54,7 @@ const CustomPieTooltip = ({ active, payload }: { active?: boolean; payload?: any
   const { name, payload: data } = payload[0];
 
   return (
-    <div className="rounded-md border bg-background px-3 py-2 text-sm shadow-md">
+    <div className="rounded-md border bg-background px-3 py-2 text-sm shadow-md text-foreground">
       <div className="font-medium">
         {chartConfig[name as keyof typeof chartConfig]?.label ?? name}
       </div>
@@ -123,7 +123,7 @@ export default function SpendingBreakdownChart() {
                     y={props.y}
                     textAnchor={props.textAnchor}
                     dominantBaseline={props.dominantBaseline}
-                    fill="hsl(var(--muted-foreground))"
+                    fill="var(--muted-foreground)"
                     className="text-xs font-semibold"
                   >
                     {payload.formattedLabel}
