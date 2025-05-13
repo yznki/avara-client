@@ -6,6 +6,7 @@ import { TransactionRangeProvider } from './context/TransactionRangeContext';
 import Layout from './layouts/layout';
 import Accounts from './pages/Accounts';
 import Dashboard from './pages/Dashboard';
+import NotFoundPage from './pages/NotFoundPage';
 import Transactions from './pages/Transactions';
 
 export const router = createBrowserRouter([
@@ -39,6 +40,6 @@ export const router = createBrowserRouter([
   },
   {
     path: '*',
-    element: <div>404</div>,
+    element: <NotFoundPage />,
   },
 ]);
