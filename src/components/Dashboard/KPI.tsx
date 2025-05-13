@@ -14,19 +14,13 @@ interface KPIProps {
   isCurrency?: boolean;
 }
 
-const colorVariants = {
-  primary: 'text-blue-900',
-  secondary: 'text-blue-600',
-  muted: 'text-blue-400',
+const colorVariants: Record<NonNullable<KPIProps['color']>, string> = {
+  primary: 'text-primary',
+  secondary: 'text-secondary',
+  muted: 'text-muted-foreground',
 };
 
-export const KPI: React.FC<KPIProps> = ({
-  title,
-  value,
-  icon,
-  color = 'primary',
-  isCurrency,
-}: KPIProps) => {
+export const KPI: React.FC<KPIProps> = ({ title, value, icon, color = 'primary', isCurrency }) => {
   const { currency, rate } = useCurrency();
 
   const formattedValue = isCurrency
@@ -37,7 +31,7 @@ export const KPI: React.FC<KPIProps> = ({
     <Card className="w-full">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-sm text-muted-foreground">{title}</CardTitle>
-        <div className={colorVariants[color]}>{icon}</div>
+        <div className={cn('text-2xl', colorVariants[color])}>{icon}</div>
       </CardHeader>
       <CardContent>
         <div className={cn('text-5xl font-semibold tracking-tight', colorVariants[color])}>
