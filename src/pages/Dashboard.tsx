@@ -12,15 +12,21 @@ export default function Dashboard() {
 
   const balance = accounts.find((account) => account.accountType === 'checking')?.balance || 0;
 
+  const now = new Date();
+  const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+  const lastDayOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+
   const spending = transactions.reduce((acc, tx) => {
-    if (tx.type != 'deposit') {
+    const txDate = new Date(tx.createdAt);
+    if (tx.type != 'deposit' && txDate >= firstDayOfMonth && txDate <= lastDayOfMonth) {
       acc += tx.amount;
     }
     return acc;
   }, 0);
 
   const deposits = transactions.reduce((acc, tx) => {
-    if (tx.type === 'deposit') {
+    const txDate = new Date(tx.createdAt);
+    if (tx.type === 'deposit' && txDate >= firstDayOfMonth && txDate <= lastDayOfMonth) {
       acc += tx.amount;
     }
     return acc;
