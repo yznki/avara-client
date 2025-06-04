@@ -1,6 +1,8 @@
 import { useEffect } from 'react';
+import { useUserContext } from '@/context/UserContext';
 import { Outlet, useLocation } from 'react-router-dom';
 import { getCookie } from '@/lib/cookies';
+import { useRoleBasedThemeStyle } from '@/lib/useRoleBasedThemeStyle';
 import { AppSidebar } from '@/components/Sidebar/Sidebar';
 import { Separator } from '@/components/ui/separator';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
@@ -9,6 +11,8 @@ const pageTitles: Record<string, string> = {
   '': 'Dashboard',
   accounts: 'Accounts',
   transactions: 'Transactions',
+  users: 'Users',
+  reports: 'Reports',
 };
 
 function Layout() {
@@ -19,8 +23,13 @@ function Layout() {
   const segment = location.pathname.split('/').filter(Boolean).pop() ?? '';
   const pageTitle = pageTitles[segment] || 'Page';
 
+  const { refetchAccountsAndTransactions } = useUserContext();
+
+  useRoleBasedThemeStyle();
+
   useEffect(() => {
     document.title = `Avara | ${pageTitle}`;
+    refetchAccountsAndTransactions();
   }, [pageTitle]);
 
   return (
