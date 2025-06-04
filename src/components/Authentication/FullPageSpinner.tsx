@@ -1,25 +1,8 @@
-import { useEffect } from 'react';
-import { useUserContext } from '@/context/UserContext';
 import { Loader2 } from 'lucide-react';
+import { useRoleBasedThemeStyle } from '@/lib/useRoleBasedThemeStyle';
 
 export default function FullPageSpinner() {
-  const { user, isBackendLoading } = useUserContext();
-
-  useEffect(() => {
-    const html = document.documentElement;
-
-    if (!isBackendLoading) {
-      if (user?.role === 'admin') {
-        html.classList.add('admin');
-      } else {
-        html.classList.remove('admin');
-      }
-    }
-
-    return () => {
-      html.classList.remove('admin');
-    };
-  }, [user?.role, isBackendLoading]);
+  useRoleBasedThemeStyle();
 
   return (
     <div className="flex h-screen items-center justify-center bg-background text-primary">
