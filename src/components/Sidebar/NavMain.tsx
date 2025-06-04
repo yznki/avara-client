@@ -1,6 +1,5 @@
-'use client';
-
-import { CreditCard, LayoutDashboard, ListOrdered } from 'lucide-react';
+import { useUserContext } from '@/context/UserContext'; // ⬅️ add this
+import { CreditCard, LayoutDashboard, ListOrdered, Users as UsersIcon } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import {
@@ -13,24 +12,22 @@ import {
 
 export function NavMain() {
   const location = useLocation();
+  const { user } = useUserContext();
+  const isAdmin = user?.role === 'admin';
 
-  const navItems = [
-    {
-      title: 'Dashboard',
-      icon: LayoutDashboard,
-      to: '/',
-    },
-    {
-      title: 'Accounts',
-      icon: CreditCard,
-      to: '/accounts',
-    },
-    {
-      title: 'Transactions',
-      icon: ListOrdered,
-      to: '/transactions',
-    },
+  const adminItems = [
+    { title: 'Dashboard', icon: LayoutDashboard, to: '/' },
+    { title: 'Users', icon: UsersIcon, to: '/users' },
+    // { title: 'Reports', icon: BarChart3, to: '/reports' },
   ];
+
+  const userItems = [
+    { title: 'Dashboard', icon: LayoutDashboard, to: '/' },
+    { title: 'Accounts', icon: CreditCard, to: '/accounts' },
+    { title: 'Transactions', icon: ListOrdered, to: '/transactions' },
+  ];
+
+  const navItems = isAdmin ? adminItems : userItems;
 
   return (
     <SidebarGroup>

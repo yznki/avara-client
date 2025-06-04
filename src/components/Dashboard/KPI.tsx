@@ -2,9 +2,10 @@
 
 import React from 'react';
 import { useCurrency } from '@/context/CurrencyContext';
-import { formatCurrency } from '@/lib/currencies';
+import { abbreviateNumber } from '@/lib/currencies';
 import { cn } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface KPIProps {
   title: string;
@@ -12,6 +13,7 @@ interface KPIProps {
   icon: React.ReactNode;
   color?: 'primary' | 'secondary' | 'muted';
   isCurrency?: boolean;
+  loading?: boolean;
 }
 
 const colorVariants: Record<NonNullable<KPIProps['color']>, string> = {
@@ -20,11 +22,18 @@ const colorVariants: Record<NonNullable<KPIProps['color']>, string> = {
   muted: 'text-muted-foreground',
 };
 
-export const KPI: React.FC<KPIProps> = ({ title, value, icon, color = 'primary', isCurrency }) => {
+export const KPI: React.FC<KPIProps> = ({
+  title,
+  value,
+  icon,
+  color = 'primary',
+  isCurrency,
+  loading = false,
+}) => {
   const { currency, rate } = useCurrency();
 
   const formattedValue = isCurrency
-    ? formatCurrency((value as number) * rate, currency)
+    ? `${abbreviateNumber((value as number) * rate)} ${currency}`
     : value.toString();
 
   return (
@@ -34,9 +43,13 @@ export const KPI: React.FC<KPIProps> = ({ title, value, icon, color = 'primary',
         <div className={cn('text-2xl', colorVariants[color])}>{icon}</div>
       </CardHeader>
       <CardContent>
-        <div className={cn('text-5xl font-semibold tracking-tight', colorVariants[color])}>
-          {formattedValue}
-        </div>
+        {loading ? (
+          <Skeleton className="h-10 w-3/4 rounded-md" />
+        ) : (
+          <div className={cn('text-5xl font-semibold tracking-tight', colorVariants[color])}>
+            {formattedValue}
+          </div>
+        )}
       </CardContent>
     </Card>
   );

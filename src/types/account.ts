@@ -25,30 +25,3 @@ export function getAccountName(accountType: string | AccountType): string {
       return 'Unknown Account Type';
   }
 }
-
-export const mockUserAccounts: AccountResponse[] = [
-  {
-    _id: '1',
-    userId: 'user1',
-    accountType: 'checking',
-    balance: 5000,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  },
-  {
-    _id: '2',
-    userId: 'user1',
-    accountType: 'savings',
-    balance: 15000,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  },
-  {
-    _id: '3',
-    userId: 'user1',
-    accountType: 'investment',
-    balance: -2000,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  },
-];
