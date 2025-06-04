@@ -14,3 +14,10 @@ export const getAdminTransactions = async (token: string) =>
   axios.get(`${API_BASE_URL}/admin/transactions`, {
     headers: { Authorization: `Bearer ${token}` },
   });
+
+export const deleteUser = async (userId: string, token: string) =>
+  axios.delete(`${API_BASE_URL}/admin/users/${userId}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });

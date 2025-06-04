@@ -96,8 +96,8 @@ export function AccountBalanceDonutChart({ accounts }: { accounts: AccountRespon
             <span>No account balances available.</span>
           </div>
         ) : (
-          <ChartContainer config={chartConfig} className="mx-auto max-h-[300px]">
-            <ResponsiveContainer width="100%">
+          <ChartContainer config={chartConfig} className="mx-auto">
+            <ResponsiveContainer width="100%" height={300}>
               <PieChart>
                 <Pie
                   data={chartData}
