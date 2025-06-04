@@ -40,6 +40,8 @@ export function TransactionVolumeAreaChart({ transactions }: Props) {
       }));
   }, [transactions]);
 
+  const isEmpty = chartData.length === 0;
+
   return (
     <Card>
       <CardHeader>
@@ -47,71 +49,82 @@ export function TransactionVolumeAreaChart({ transactions }: Props) {
         <CardDescription>Daily total transaction volume</CardDescription>
       </CardHeader>
       <CardContent>
-        <ChartContainer
-          config={{
-            volume: {
-              label: 'Volume',
-              color: 'var(--chart-1)',
-            },
-          }}
-        >
-          <ResponsiveContainer width="100%" height={280}>
-            <AreaChart data={chartData} margin={{ left: 12, right: 12, bottom: 8 }}>
-              <CartesianGrid vertical={false} />
-              <XAxis
-                dataKey="date"
-                tickLine={false}
-                axisLine={false}
-                tickMargin={8}
-                tickFormatter={(value) => format(parseISO(value), 'MMM d')}
-              />
-              <YAxis
-                tickLine={false}
-                axisLine={false}
-                tickMargin={10}
-                tick={{ fontSize: 12 }}
-                tickFormatter={(val) =>
-                  `${abbreviateNumber(val * rate)} ${getCurrencySymbol(currency)}`
-                }
-              />
-
-              <ChartTooltip
-                cursor={false}
-                content={
-                  <ChartTooltipContent
-                    formatter={(val) =>
-                      `${abbreviateNumber(Number(val) * rate)} ${getCurrencySymbol(currency)}`
-                    }
-                  />
-                }
-              />
-              <defs>
-                <linearGradient id="fillVolume" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="var(--chart-1)" stopOpacity={0.8} />
-                  <stop offset="95%" stopColor="var(--chart-1)" stopOpacity={0.05} />
-                </linearGradient>
-              </defs>
-              <Area
-                dataKey="volume"
-                type="monotone"
-                fill="url(#fillVolume)"
-                stroke="var(--chart-1)"
-                strokeWidth={2}
-                dot={{ fill: 'var(--chart-1)', r: 2 }}
-                activeDot={{ r: 4 }}
-              />
-            </AreaChart>
-          </ResponsiveContainer>
-        </ChartContainer>
+        {isEmpty ? (
+          <div className="flex flex-col items-center justify-center text-muted-foreground text-sm h-64 animate-fade-in">
+            <img
+              src="/empty-states/empty-admin-chart-5.svg"
+              alt="No transaction volume"
+              className="w-64 h-40 mb-4"
+            />
+            <span>No transaction volume available.</span>
+          </div>
+        ) : (
+          <ChartContainer
+            config={{
+              volume: {
+                label: 'Volume',
+                color: 'var(--chart-1)',
+              },
+            }}
+          >
+            <ResponsiveContainer width="100%" height={280}>
+              <AreaChart data={chartData} margin={{ left: 12, right: 12, bottom: 8 }}>
+                <CartesianGrid vertical={false} />
+                <XAxis
+                  dataKey="date"
+                  tickLine={false}
+                  axisLine={false}
+                  tickMargin={8}
+                  tickFormatter={(value) => format(parseISO(value), 'MMM d')}
+                />
+                <YAxis
+                  tickLine={false}
+                  axisLine={false}
+                  tickMargin={10}
+                  tick={{ fontSize: 12 }}
+                  tickFormatter={(val) =>
+                    `${abbreviateNumber(val * rate)} ${getCurrencySymbol(currency)}`
+                  }
+                />
+                <ChartTooltip
+                  cursor={false}
+                  content={
+                    <ChartTooltipContent
+                      formatter={(val) =>
+                        `${abbreviateNumber(Number(val) * rate)} ${getCurrencySymbol(currency)}`
+                      }
+                    />
+                  }
+                />
+                <defs>
+                  <linearGradient id="fillVolume" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="var(--chart-1)" stopOpacity={0.8} />
+                    <stop offset="95%" stopColor="var(--chart-1)" stopOpacity={0.05} />
+                  </linearGradient>
+                </defs>
+                <Area
+                  dataKey="volume"
+                  type="monotone"
+                  fill="url(#fillVolume)"
+                  stroke="var(--chart-1)"
+                  strokeWidth={2}
+                  dot={{ fill: 'var(--chart-1)', r: 2 }}
+                  activeDot={{ r: 4 }}
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          </ChartContainer>
+        )}
       </CardContent>
       <CardFooter>
         <div className="flex w-full items-start gap-2 text-sm">
           <div className="grid gap-2">
             <div className="flex items-center gap-2 leading-none font-medium">
-              Trending up this month <TrendingUp className="h-4 w-4" />
+              {isEmpty ? 'No trend to show' : 'Trending up this month'}
+              <TrendingUp className="h-4 w-4" />
             </div>
             <div className="text-muted-foreground flex items-center gap-2 leading-none">
-              Based on real transaction data
+              {isEmpty ? 'Awaiting transaction activity' : 'Based on real transaction data'}
             </div>
           </div>
         </div>
