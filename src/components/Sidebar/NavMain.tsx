@@ -1,11 +1,5 @@
 import { useUserContext } from '@/context/UserContext'; // ⬅️ add this
-import {
-  BarChart3,
-  CreditCard,
-  LayoutDashboard,
-  ListOrdered,
-  Users as UsersIcon,
-} from 'lucide-react';
+import { CreditCard, LayoutDashboard, ListOrdered, Users as UsersIcon } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import {
@@ -24,8 +18,7 @@ export function NavMain() {
   const adminItems = [
     { title: 'Dashboard', icon: LayoutDashboard, to: '/' },
     { title: 'Users', icon: UsersIcon, to: '/users' },
-    { title: 'Transactions', icon: ListOrdered, to: '/transactions' },
-    { title: 'Reports', icon: BarChart3, to: '/reports' },
+    // { title: 'Reports', icon: BarChart3, to: '/reports' },
   ];
 
   const userItems = [

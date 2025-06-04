@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
+import type { AccountResponse } from '@/types/account';
+import type { TransactionResponse } from '@/types/transaction';
 import type { UserResponse } from '@/types/user';
 import { useAuth0 } from '@auth0/auth0-react';
 import { toast } from 'sonner';
-import { deleteUser, getAllUsers } from '@/lib/admin';
+import { deleteUser, getAdminTransactions, getAllAccounts, getAllUsers } from '@/lib/admin';
 import AdminUsersDataTable from '@/components/Admin/UsersTable/AdminUsersDataTable';
 import UserSidebar from '@/components/Admin/UsersTable/UserSidebar';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -25,6 +27,9 @@ function Users() {
   const [loading, setLoading] = useState(true);
   const [selectedUser, setSelectedUser] = useState<UserResponse | null>(null);
 
+  const [accounts, setAccounts] = useState<AccountResponse[]>([]);
+  const [transactions, setTransactions] = useState<TransactionResponse[]>([]);
+
   async function handleUserDelete(user: UserResponse) {
     try {
       const token = await getAccessTokenSilently();
@@ -40,19 +45,27 @@ function Users() {
   }
 
   useEffect(() => {
-    async function fetchUsers() {
+    async function fetchEverything() {
       try {
         const token = await getAccessTokenSilently();
-        const usersRes = await getAllUsers(token);
+
+        const [usersRes, accountsRes, transactionsRes] = await Promise.all([
+          getAllUsers(token),
+          getAllAccounts(token),
+          getAdminTransactions(token),
+        ]);
+
         setUsers(usersRes.data);
+        setAccounts(accountsRes.data);
+        setTransactions(transactionsRes.data);
       } catch (err) {
-        console.error('Error fetching users:', err);
+        console.error('Error fetching initial data:', err);
       } finally {
         setLoading(false);
       }
     }
 
-    fetchUsers();
+    fetchEverything();
   }, [getAccessTokenSilently]);
 
   if (loading) {
@@ -83,6 +96,16 @@ function Users() {
           open={!!selectedUser}
           onClose={() => setSelectedUser(null)}
           onDelete={() => handleUserDelete(selectedUser)}
+          accounts={accounts.filter((acc) => acc.userId === selectedUser._id)}
+          transactions={transactions
+            .filter((tx) =>
+              accounts.some(
+                (acc) =>
+                  (acc.userId === selectedUser._id && acc._id === tx.fromAccountId) ||
+                  (acc.userId === selectedUser._id && acc._id === tx.toAccountId),
+              ),
+            )
+            .slice(0, 50)}
         />
       )}
     </div>

@@ -1,10 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import type { AccountResponse } from '@/types/account';
 import type { TransactionResponse } from '@/types/transaction';
-import { useAuth0 } from '@auth0/auth0-react';
-import { getAdminTransactions, getAllAccounts } from '@/lib/admin';
+import type { UserResponse } from '@/types/user';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -27,69 +25,29 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet';
-import { Skeleton } from '@/components/ui/skeleton';
 
 interface Props {
-  user: {
-    _id: string;
-    name: string;
-    email: string;
-    role: 'user' | 'admin';
-    profilePicture: string;
-  };
+  user: UserResponse;
   open: boolean;
   onClose: () => void;
   onDelete: () => void;
+  accounts: AccountResponse[];
+  transactions: TransactionResponse[];
 }
 
-export default function UserSidebar({ user, open, onClose, onDelete }: Props) {
-  const { getAccessTokenSilently } = useAuth0();
-
-  const [accounts, setAccounts] = useState<AccountResponse[]>([]);
-  const [transactions, setTransactions] = useState<TransactionResponse[]>([]);
-  const [loading, setLoading] = useState(true);
-
+export default function UserSidebar({
+  user,
+  open,
+  onClose,
+  onDelete,
+  accounts,
+  transactions,
+}: Props) {
   const initials = user.name
     .split(' ')
     .map((n) => n[0])
     .join('')
     .toUpperCase();
-
-  useEffect(() => {
-    if (!open || !user?._id) return;
-
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const token = await getAccessTokenSilently();
-
-        const [allAccountsRes, allTransactionsRes] = await Promise.all([
-          getAllAccounts(token),
-          getAdminTransactions(token),
-        ]);
-
-        const allAccounts: AccountResponse[] = allAccountsRes.data || [];
-        const allTransactions: TransactionResponse[] = allTransactionsRes.data || [];
-
-        const userAccounts = allAccounts.filter((a) => a.userId === user._id);
-        const userAccountIds = userAccounts.map((acc) => acc._id);
-
-        const userTransactions = allTransactions
-          .filter((t) => t.fromAccountId && userAccountIds.includes(t.fromAccountId))
-          .slice(0, 50);
-        setAccounts(userAccounts);
-        setTransactions(userTransactions);
-      } catch (err) {
-        console.error('Error loading user data:', err);
-        setAccounts([]);
-        setTransactions([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [open, user._id, getAccessTokenSilently]);
 
   return (
     <Sheet open={open} onOpenChange={onClose}>
@@ -117,12 +75,7 @@ export default function UserSidebar({ user, open, onClose, onDelete }: Props) {
             {/* Accounts */}
             <div>
               <h3 className="text-sm font-semibold mb-2">Accounts</h3>
-              {loading ? (
-                <div className="space-y-3">
-                  <Skeleton className="h-20 rounded-lg" />
-                  <Skeleton className="h-20 rounded-lg" />
-                </div>
-              ) : accounts.length ? (
+              {accounts.length ? (
                 <div className="space-y-3">
                   {accounts.map((account) => (
                     <div key={account._id} className="border rounded-lg p-4">
@@ -145,15 +98,7 @@ export default function UserSidebar({ user, open, onClose, onDelete }: Props) {
             {/* Transactions */}
             <div>
               <h3 className="text-sm font-semibold mb-2">Recent Transactions</h3>
-              {loading ? (
-                <div className="space-y-2">
-                  {Array(5)
-                    .fill(0)
-                    .map((_, i) => (
-                      <Skeleton key={i} className="h-6 rounded-md" />
-                    ))}
-                </div>
-              ) : transactions.length ? (
+              {transactions.length ? (
                 <div className="text-sm space-y-1">
                   {transactions.map((tx) => (
                     <div
