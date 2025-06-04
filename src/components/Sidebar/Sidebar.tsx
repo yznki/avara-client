@@ -92,6 +92,9 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
           <NavSecondary />
         </SidebarContent>
         <SidebarFooter>
+          {user.role === 'admin' && open && !isMobile && (
+            <span className="text-xs text-muted-foreground px-2">Admin Mode</span>
+          )}
           <NavUser
             user={{
               name: user.name,
