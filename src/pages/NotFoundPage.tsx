@@ -1,8 +1,28 @@
+import { useEffect } from 'react';
+import { useUserContext } from '@/context/UserContext';
 import { Ghost } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 
 export default function NotFoundPage() {
+  const { user, isBackendLoading } = useUserContext();
+
+  useEffect(() => {
+    const html = document.documentElement;
+
+    if (!isBackendLoading) {
+      if (user?.role === 'admin') {
+        html.classList.add('admin');
+      } else {
+        html.classList.remove('admin');
+      }
+    }
+
+    return () => {
+      html.classList.remove('admin');
+    };
+  }, [user?.role, isBackendLoading]);
+
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-6 text-center">
       <Ghost className="w-16 h-16 mb-4 text-gray-400" />

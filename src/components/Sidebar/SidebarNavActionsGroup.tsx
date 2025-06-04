@@ -1,5 +1,6 @@
 'use client';
 
+import { useUserContext } from '@/context/UserContext';
 import { ArrowDownToLine, ArrowUpToLine, Banknote } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -16,6 +17,9 @@ export function SidebarNavActionsGroup({
 }) {
   const { state, isMobile } = useSidebar();
   const isExpanded = state === 'expanded';
+
+  const { user } = useUserContext();
+  if (user?.role === 'admin') return null;
 
   const actions = [
     {
