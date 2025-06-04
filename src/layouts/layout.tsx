@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { useUserContext } from '@/context/UserContext';
 import { Outlet, useLocation } from 'react-router-dom';
 import { getCookie } from '@/lib/cookies';
 import { AppSidebar } from '@/components/Sidebar/Sidebar';
@@ -19,8 +20,27 @@ function Layout() {
   const segment = location.pathname.split('/').filter(Boolean).pop() ?? '';
   const pageTitle = pageTitles[segment] || 'Page';
 
+  const { user, isBackendLoading, refetchAccountsAndTransactions } = useUserContext();
+
+  useEffect(() => {
+    const html = document.documentElement;
+
+    if (!isBackendLoading) {
+      if (user?.role === 'admin') {
+        html.classList.add('admin');
+      } else {
+        html.classList.remove('admin');
+      }
+    }
+
+    return () => {
+      html.classList.remove('admin');
+    };
+  }, [user?.role, isBackendLoading]);
+
   useEffect(() => {
     document.title = `Avara | ${pageTitle}`;
+    refetchAccountsAndTransactions();
   }, [pageTitle]);
 
   return (
