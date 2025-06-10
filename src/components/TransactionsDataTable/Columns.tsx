@@ -7,6 +7,12 @@ import { formatCurrency } from '@/lib/currencies';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
 
+function AmountCell({ amount }: { amount: number }) {
+  const { currency, rate } = useCurrency();
+  const formatted = formatCurrency(amount * rate, currency);
+  return <div className="text-left font-medium">{formatted}</div>;
+}
+
 export type TransactionTableEntry = {
   id: string;
   type: 'deposit' | 'withdrawal' | 'internal_transfer' | 'external_transfer';
@@ -95,12 +101,8 @@ export const columns: ColumnDef<TransactionTableEntry>[] = [
     enableSorting: true,
     sortingFn: 'basic',
     cell: ({ row }) => {
-      const { currency, rate } = useCurrency();
-
       const amount = parseFloat(row.getValue('amount'));
-      const formatted = formatCurrency(amount * rate, currency);
-
-      return <div className="text-left font-medium">{formatted}</div>;
+      return <AmountCell amount={amount} />;
     },
   },
   {
