@@ -108,7 +108,7 @@ function Overview({ account, userTransactions, onDelete, isDeleting }: OverviewP
       </div>
 
       <div className="grid gap-2">
-        <span className="text-lg font-semibold">Recent Transcations</span>
+        <span className="text-lg font-semibold">Recent Transactions</span>
         <TransactionsDataTable transactions={filteredTransactions} accounts={accounts} />
       </div>
     </div>
