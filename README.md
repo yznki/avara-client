@@ -1,4 +1,4 @@
-# Avara — Modern Banking Made Simple 💳✨
+# Avara — Modern Banking Made Simple 
 
 **Avara** is a sleek, responsive, and modular frontend application designed for managing bank accounts, visualizing financial analytics, and enabling seamless user and admin operations. Built with **React**, **TailwindCSS**, and **ShadCN UI**, it delivers a smooth, modern interface with built-in customization and theming.
 
@@ -6,18 +6,18 @@
 
 ---
 
-## 🚀 Features
+## Features
 
-- 🧠 **Smart Dashboard** – User-centric homepage with KPIs, real-time data, and clear insights.
-- 💸 **Transactions Module** – Supports deposits, withdrawals, internal & external transfers.
-- 🛡️ **Admin Panel** – Manage users, perform manual transactions, and audit logs.
-- 🌗 **Light & Dark Modes** – Theme-aware design system using CSS variables.
-- 📊 **Beautiful Charts** – Recharts-powered visualizations with theme-aligned gradients.
-- 🎨 **Custom Theming** – Font, spacing, and token-based system using Tailwind & CVA.
+- **Smart Dashboard** – User-centric homepage with KPIs, real-time data, and clear insights.
+- **Transactions Module** – Supports deposits, withdrawals, internal & external transfers.
+- **Admin Panel** – Manage users, perform manual transactions, and audit logs.
+- **Light & Dark Modes** – Theme-aware design system using CSS variables.
+- **Beautiful Charts** – Recharts-powered visualizations with theme-aligned gradients.
+- **Custom Theming** – Font, spacing, and token-based system using Tailwind & CVA.
 
 ---
 
-## 🧱 Tech Stack
+## Tech Stack
 
 - **React 19**
 - **TypeScript**
@@ -29,7 +29,7 @@
 
 ---
 
-## 🗂️ Folder Structure
+## Folder Structure
 
 ```
 src/
@@ -43,7 +43,7 @@ src/
 
 ---
 
-## 🧑‍🎨 Customization
+## Customization
 
 - Fonts: [Satoshi](https://www.fontshare.com/fonts/satoshi)
 - All themes use design tokens defined in `theme.ts`
@@ -52,7 +52,7 @@ src/
 
 ---
 
-## ⚙️ Setup
+## Setup
 
 ```bash
 pnpm install
@@ -63,7 +63,7 @@ pnpm dev
 
 ---
 
-## 🔐 Environment Variables
+## Environment Variables
 
 Make sure to configure your `.env` file as shown below (see `.env.example`):
 
@@ -74,7 +74,7 @@ Make sure to configure your `.env` file as shown below (see `.env.example`):
 
 ---
 
-## 🧾 License
+## License
 
 [MIT](LICENSE) — build freely, fork confidently.
 
