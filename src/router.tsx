@@ -5,6 +5,7 @@ import FullPageSpinner from './components/Authentication/FullPageSpinner';
 import AuthGuard from './components/AuthGaurd';
 import { TransactionRangeProvider } from './context/TransactionRangeContext';
 import Layout from './layouts/layout';
+import Reports from './pages/Admin/Reports';
 import Users from './pages/Admin/Users';
 import Dashboard from './pages/Dashboard';
 import NotFoundPage from './pages/NotFoundPage';
@@ -48,6 +49,14 @@ export const router = createBrowserRouter([
         element: (
           <AdminGuard>
             <Users />
+          </AdminGuard>
+        ),
+      },
+      {
+        path: 'reports',
+        element: (
+          <AdminGuard>
+            <Reports />
           </AdminGuard>
         ),
       },
